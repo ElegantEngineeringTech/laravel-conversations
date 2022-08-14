@@ -1,12 +1,12 @@
 <?php
 
-namespace VendorName\Skeleton\Commands;
+namespace Finller\Conversation\Commands;
 
 use Illuminate\Console\Command;
 
-class SkeletonCommand extends Command
+class ConversationCommand extends Command
 {
-    public $signature = 'skeleton';
+    public $signature = 'laravel-conversations';
 
     public $description = 'My command';
 
