@@ -2,9 +2,9 @@
 
 namespace Finller\Conversation\Tests;
 
+use Finller\Conversation\ConversationServiceProvider;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Orchestra\Testbench\TestCase as Orchestra;
-use Finller\Conversation\ConversationServiceProvider;
 
 class TestCase extends Orchestra
 {

@@ -2,9 +2,9 @@
 
 namespace Finller\Conversation;
 
+use Finller\Conversation\Commands\ConversationCommand;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
-use Finller\Conversation\Commands\ConversationCommand;
 
 class ConversationServiceProvider extends PackageServiceProvider
 {
