@@ -18,7 +18,7 @@ class CreateMessageRequest extends FormRequest
 
     protected function prepareForValidation()
     {
-        // 
+        //
     }
 
     /**

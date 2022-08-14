@@ -2,7 +2,6 @@
 
 namespace Finller\Conversation;
 
-use Finller\Conversation\Commands\ConversationCommand;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
 
@@ -20,7 +19,7 @@ class ConversationServiceProvider extends PackageServiceProvider
             ->hasMigrations([
                 'create_conversations_table',
                 'create_messages_table',
-                'create_conversation_user_table'
+                'create_conversation_user_table',
             ])
             ->runsMigrations();
     }
