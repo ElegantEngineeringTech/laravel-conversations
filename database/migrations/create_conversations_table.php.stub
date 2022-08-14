@@ -10,11 +10,9 @@ return new class extends Migration
     {
         Schema::create('conversations', function (Blueprint $table) {
             $table->id();
-
             $table->foreignId('owner_id')->nullable();
             $table->morphs('conversationable');
             $table->json('settings')->nullable();
-
             $table->timestamps();
         });
     }

@@ -17,9 +17,11 @@ class ConversationServiceProvider extends PackageServiceProvider
          */
         $package
             ->name('laravel-conversations')
-            ->hasConfigFile()
-            ->hasViews()
-            ->hasMigration('create_laravel-conversations_table')
-            ->hasCommand(ConversationCommand::class);
+            // ->hasConfigFile()
+            // ->hasViews()
+            ->hasMigration('create_conversations_table')
+            ->hasMigration('create_messages_table')
+            ->hasMigration('create_conversation_user_table');
+            // ->hasCommand(ConversationCommand::class);
     }
 }
