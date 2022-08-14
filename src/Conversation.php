@@ -11,7 +11,6 @@ use Illuminate\Foundation\Auth\User;
 class Conversation extends Model
 {
     use HasFactory;
-    use HasMessages;
 
     protected $fillable = [
         'owner_id',
