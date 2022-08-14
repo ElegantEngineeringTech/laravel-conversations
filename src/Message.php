@@ -4,7 +4,6 @@ namespace Finller\Conversation;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Foundation\Auth\User;
 use Illuminate\Support\Carbon;
 
@@ -26,7 +25,7 @@ class Message extends Model
 
     protected $casts = [
         'settings' => 'array',
-        'read_at' => 'datetime'
+        'read_at' => 'datetime',
     ];
 
     public function conversation(): BelongsTo
@@ -42,6 +41,7 @@ class Message extends Model
     public function markAsRead()
     {
         $this->read_at = now();
+
         return $this;
     }
 }
