@@ -1,9 +1,10 @@
 {
     "name": "finller/laravel-conversations",
-    "description": "This is my package laravel-conversations",
+    "description": "Attach chat to any model",
     "keywords": [
         "finller",
         "laravel",
+        "chat",
         "laravel-conversations"
     ],
     "homepage": "https://github.com/finller/laravel-conversations",
