@@ -21,14 +21,14 @@ composer require finller/laravel-conversations
 You can publish and run the migrations with:
 
 ```bash
-php artisan vendor:publish --tag="laravel-conversations-migrations"
+php artisan vendor:publish --tag="conversations-migrations"
 php artisan migrate
 ```
 
 You can publish the config file with:
 
 ```bash
-php artisan vendor:publish --tag="laravel-conversations-config"
+php artisan vendor:publish --tag="conversations-config"
 ```
 
 This is the contents of the published config file:
