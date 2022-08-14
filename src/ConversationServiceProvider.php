@@ -22,6 +22,6 @@ class ConversationServiceProvider extends PackageServiceProvider
             ->hasMigration('create_conversations_table')
             ->hasMigration('create_messages_table')
             ->hasMigration('create_conversation_user_table');
-            // ->hasCommand(ConversationCommand::class);
+        // ->hasCommand(ConversationCommand::class);
     }
 }
