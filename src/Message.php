@@ -22,7 +22,7 @@ class Message extends Model
         'messageable_type',
         'participant_id',
         'participant_type',
-        'metadata'
+        'metadata',
     ];
 
     protected $casts = [
