@@ -14,11 +14,11 @@ class Conversation extends Model
 
     protected $fillable = [
         'owner_id',
-        'settings',
+        'metadata',
     ];
 
     protected $casts = [
-        'settings' => 'array',
+        'metadata' => 'array',
     ];
 
     public function users()

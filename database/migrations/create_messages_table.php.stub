@@ -20,7 +20,7 @@ class CreateMessagesTable extends Migration
             $table->foreignId('conversation_id')->nullable();
             $table->foreignId('user_id');
             $table->dateTime('read_at')->nullable();
-            $table->json('settings')->nullable();
+            $table->json('metadata')->nullable();
             $table->softDeletes();
             $table->timestamps();
         });

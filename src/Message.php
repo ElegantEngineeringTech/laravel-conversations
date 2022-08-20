@@ -22,10 +22,11 @@ class Message extends Model
         'messageable_type',
         'participant_id',
         'participant_type',
+        'metadata'
     ];
 
     protected $casts = [
-        'settings' => 'array',
+        'metadata' => 'array',
         'read_at' => 'datetime',
     ];
 
