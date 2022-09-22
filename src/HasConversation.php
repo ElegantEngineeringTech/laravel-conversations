@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Relations\MorphOne;
  */
 trait HasConversation
 {
-    protected static function bootedHasConversation()
+    protected static function bootHasConversation()
     {
         // static::deleting(function (Model $model) {
         //     $model->conversation()->delete(); // @phpstan-ignore-line
