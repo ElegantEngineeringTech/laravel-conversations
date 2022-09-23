@@ -35,7 +35,7 @@ class Message extends Model
 
     public function user(): BelongsTo
     {
-        return $this->belongsTo(config('conversations.model_message'));
+        return $this->belongsTo(config('conversations.model_user'));
     }
 
     public function markAsRead()

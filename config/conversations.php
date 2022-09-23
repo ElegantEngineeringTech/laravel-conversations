@@ -6,6 +6,6 @@ use Illuminate\Foundation\Auth\User;
 
 return [
 
-    'model_message' => User::class,
+    'model_user' => User::class,
 
 ];
