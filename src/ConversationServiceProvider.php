@@ -21,6 +21,7 @@ class ConversationServiceProvider extends PackageServiceProvider
                 'create_messages_table',
                 'create_conversation_user_table',
             ])
+            ->hasConfigFile()
             ->runsMigrations();
     }
 }
