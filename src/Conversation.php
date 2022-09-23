@@ -38,16 +38,16 @@ class Conversation extends Model
 
     public function messages(): HasMany
     {
-        return $this->hasMany(Message::class);
+        return $this->hasMany(config('conversations.model_message'));
     }
 
     public function latestMessage()
     {
-        return $this->hasOne(Message::class)->latestOfMany();
+        return $this->hasOne(config('conversations.model_message'))->latestOfMany();
     }
 
     public function oldestMessage()
     {
-        return $this->hasOne(Message::class)->oldestOfMany();
+        return $this->hasOne(config('conversations.model_message'))->oldestOfMany();
     }
 }
