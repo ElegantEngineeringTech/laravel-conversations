@@ -6,7 +6,9 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 /**
@@ -30,7 +32,7 @@ class Conversation extends Model
         return $this->morphTo();
     }
 
-    public function users()
+    public function users(): BelongsToMany
     {
         return $this->belongsToMany(config('conversations.model_user'));
     }
@@ -45,12 +47,12 @@ class Conversation extends Model
         return $this->hasMany(config('conversations.model_message'));
     }
 
-    public function latestMessage()
+    public function latestMessage(): HasOne
     {
         return $this->hasOne(config('conversations.model_message'))->latestOfMany();
     }
 
-    public function oldestMessage()
+    public function oldestMessage(): HasOne
     {
         return $this->hasOne(config('conversations.model_message'))->oldestOfMany();
     }
