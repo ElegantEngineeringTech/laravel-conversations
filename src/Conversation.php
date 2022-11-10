@@ -43,7 +43,6 @@ class Conversation extends Model
          * - Flexibility: so you can choose how to deal with it
          */
         static::deleting(function (Conversation $conversation) {
-
             if (config('conversations.cascade_conversation_delete_to_messages')) {
                 $conversation->messages()->delete();
             } else {

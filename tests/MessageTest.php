@@ -22,9 +22,9 @@ it('can retreive read datetime of a user as Carbon instance', function () {
     $message = Message::factory()->make([
         'metadata' => [
             'read_by' => [
-                $USER_ID => now()
-            ]
-        ]
+                $USER_ID => now(),
+            ],
+        ],
     ]);
 
     expect($message->getReadBy($USER_ID))->toBeInstanceOf(Carbon::class);
@@ -33,7 +33,7 @@ it('can retreive read datetime of a user as Carbon instance', function () {
 it('serialize and unserialize widget', function () {
     /** @var Message */
     $message = Message::factory()->make([
-        'widget' => new WidgetExample("Hello", "World") // will call Attribute set function
+        'widget' => new WidgetExample('Hello', 'World'), // will call Attribute set function
     ]);
 
     expect($message->widget)->toBeInstanceOf(WidgetExample::class);
