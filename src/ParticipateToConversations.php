@@ -17,7 +17,7 @@ trait ParticipateToConversations
     {
         static::deleting(function ($model) {
             $model->conversations()->detach();
-            
+
             if (config('conversations.cascade_user_delete_to_messages')) {
                 $model->messages()->delete();
             }
