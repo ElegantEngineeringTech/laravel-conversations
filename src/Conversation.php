@@ -47,7 +47,7 @@ class Conversation extends Model
 
             if (config('conversations.cascade_conversation_delete_to_messages')) {
                 $conversation->messages()->delete();
-            } 
+            }
         });
     }
 
