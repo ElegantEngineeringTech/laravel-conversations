@@ -10,9 +10,15 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
+use Illuminate\Foundation\Auth\User;
 
 /**
  * @property Collection $users
+ * @property User $owner
+ * @property Collection<int, Message> $messages
+ * @property Collection<int, User> $users
+ * @property ?Message $latestMessage
+ * @property ?Message $oldestMessage
  */
 class Conversation extends Model
 {
@@ -26,6 +32,25 @@ class Conversation extends Model
     protected $casts = [
         'metadata' => 'array',
     ];
+
+    protected static function booted()
+    {
+        /**
+         * Cleanup pivot records
+         * We choose to not use onCascade Delete at the database level for 3 reasons:
+         * - Transactions performance
+         * - Compatibility with cloud database like PlanetScale and Vitess
+         * - Flexibility: so you can choose how to deal with it
+         */
+        static::deleting(function (Conversation $conversation) {
+
+            if (config('conversations.cascade_conversation_delete_to_messages')) {
+                $conversation->messages()->delete();
+            } else {
+                $conversation->messages()->detach();
+            }
+        });
+    }
 
     public function conversationable(): MorphTo
     {

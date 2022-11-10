@@ -12,13 +12,15 @@ trait HasConversation
 {
     protected static function bootHasConversation()
     {
-        // static::deleting(function (Model $model) {
-        //     $model->conversation()->delete(); // @phpstan-ignore-line
-        // });
+        static::deleting(function (Model $model) {
+            if (config('conversations.cascade_conversationable_delete_to_conversation')) {
+                $model->conversation()->delete();
+            }
+        });
     }
 
     public function conversation(): MorphOne
     {
-        return $this->morphOne(Conversation::class, 'conversationable');
+        return $this->morphOne(config('conversations.model_conversation'), 'conversationable');
     }
 }
