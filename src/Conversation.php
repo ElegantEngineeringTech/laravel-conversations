@@ -14,11 +14,12 @@ use Illuminate\Foundation\Auth\User;
 
 /**
  * @property Collection $users
- * @property User $owner
+ * @property ?User $owner
  * @property Collection<int, Message> $messages
  * @property Collection<int, User> $users
  * @property ?Message $latestMessage
  * @property ?Message $oldestMessage
+ * @property ?Model $conversationable
  */
 class Conversation extends Model
 {

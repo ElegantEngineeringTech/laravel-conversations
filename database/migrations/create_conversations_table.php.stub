@@ -11,7 +11,7 @@ return new class extends Migration
         Schema::create('conversations', function (Blueprint $table) {
             $table->id();
             $table->foreignId('owner_id')->nullable();
-            $table->morphs('conversationable');
+            $table->nullableMorphs('conversationable');
             $table->json('metadata')->nullable();
             $table->timestamps();
         });
