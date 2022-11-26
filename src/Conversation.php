@@ -20,6 +20,8 @@ use Illuminate\Foundation\Auth\User;
  * @property ?Message $latestMessage
  * @property ?Message $oldestMessage
  * @property ?Model $conversationable
+ * @property ?int $conversationable_id
+ * @property ?string $conversationable_type
  */
 class Conversation extends Model
 {
