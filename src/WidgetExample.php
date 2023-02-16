@@ -13,7 +13,7 @@ class WidgetExample
         //
     }
 
-    public function render()
+    public function render(): string
     {
         return "{$this->title} : {$this->content}";
     }

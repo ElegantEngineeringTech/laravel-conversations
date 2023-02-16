@@ -13,7 +13,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  */
 trait ParticipateToConversations
 {
-    protected static function booted()
+    protected static function booted(): void
     {
         static::deleting(function ($model) {
             $model->conversations()->detach();

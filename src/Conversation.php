@@ -36,7 +36,7 @@ class Conversation extends Model
         'metadata' => 'array',
     ];
 
-    protected static function booted()
+    protected static function booted(): void
     {
         /**
          * Cleanup pivot records

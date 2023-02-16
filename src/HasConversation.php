@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Relations\MorphOne;
  */
 trait HasConversation
 {
-    protected static function bootHasConversation()
+    protected static function bootHasConversation(): void
     {
         static::deleting(function (Model $model) {
             if (config('conversations.cascade_conversationable_delete_to_conversation')) {
