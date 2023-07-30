@@ -5,6 +5,7 @@
 use Finller\Conversation\Conversation;
 use Finller\Conversation\Message;
 use Illuminate\Foundation\Auth\User;
+use League\CommonMark\Extension\InlinesOnly\InlinesOnlyExtension;
 
 return [
 
@@ -31,4 +32,11 @@ return [
      * When the parent of a conversation is deleted, the conversation is deleted
      */
     'cascade_conversationable_delete_to_conversation' => false,
+
+    'markdown' => [
+        'environment' => [
+            'allow_unsafe_links' => false,
+        ],
+    ],
+
 ];

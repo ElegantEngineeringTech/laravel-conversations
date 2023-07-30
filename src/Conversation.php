@@ -61,7 +61,7 @@ class Conversation extends Model
 
     public function users(): BelongsToMany
     {
-        return $this->belongsToMany(config('conversations.model_user'));
+        return $this->belongsToMany(config('conversations.model_user'))->withTimestamps();
     }
 
     public function owner(): BelongsTo

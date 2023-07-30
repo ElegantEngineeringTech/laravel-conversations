@@ -4,14 +4,18 @@ namespace Finller\Conversation;
 
 use Illuminate\Database\Eloquent\Casts\ArrayObject;
 use Illuminate\Database\Eloquent\Casts\AsArrayObject;
-use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\HtmlString;
+use League\CommonMark\Environment\Environment;
+use League\CommonMark\Extension\InlinesOnly\InlinesOnlyExtension;
+use League\CommonMark\MarkdownConverter;
 
 /**
  * @property ?string $content
+ * @property ?array $widget
  * @property int $conversation_id
  * @property ?int $user_id
  * @property ?Carbon $created_at
@@ -29,12 +33,19 @@ class Message extends Model
         'user_id',
         'read_at',
         'metadata',
+        'widget',
     ];
 
     protected $casts = [
         'metadata' => AsArrayObject::class,
         'read_at' => 'datetime',
+        'widget' => 'array'
     ];
+
+    /**
+     * Update conversation updated_at when a message is saved
+     */
+    protected $touches = ['conversation'];
 
     public function conversation(): BelongsTo
     {
@@ -67,14 +78,39 @@ class Message extends Model
         return $datetimeAsString ? Carbon::parse($datetimeAsString) : null;
     }
 
-    /**
-     * Widget are serialized classes just like Laravel Job or Livewire Component
-     */
-    protected function widget(): Attribute
+    public function toMarkdown(): HtmlString
     {
-        return Attribute::make(
-            get: fn ($value) => $value === null ? null : unserialize($value),
-            set: fn ($value) => $value === null ? null : serialize($value)
-        )->shouldCache();
+        $environment = new Environment(config('conversations.markdown.environment'));
+
+        $environment->addExtension(new InlinesOnlyExtension);
+
+        $converter = new MarkdownConverter($environment);
+
+        return new HtmlString($converter->convert($this->content)->getContent());
+    }
+
+    public function hasWidget(): bool
+    {
+        return (bool) $this->widgetComponentName();
+    }
+
+    public function getWidgetComponent(): ?string
+    {
+        return data_get($this->widget, "component");
+    }
+
+    public function setWidget(string $componentName, array $props): static
+    {
+        $this->widget = [
+            'component' => $componentName,
+            'props' => $props,
+        ];
+
+        return $this;
+    }
+
+    public function getWidgetProps(): array
+    {
+        return data_get($this->widget, 'props', []);
     }
 }
