@@ -91,7 +91,7 @@ class Message extends Model
 
     public function hasWidget(): bool
     {
-        return (bool) $this->widgetComponentName();
+        return (bool) $this->getWidgetComponent();
     }
 
     public function getWidgetComponent(): ?string
