@@ -13,7 +13,9 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Foundation\Auth\User;
 
 /**
+ * @property int $id
  * @property Collection $users
+ * @property ?int $owner_id
  * @property ?User $owner
  * @property Collection<int, Message> $messages
  * @property Collection<int, User> $users
@@ -43,7 +45,7 @@ class Conversation extends Model
          * We choose to not use onCascade Delete at the database level for 3 reasons:
          * - Transactions performance
          * - Compatibility with cloud database like PlanetScale and Vitess
-         * - Flexibility: so you can choose how to deal with it
+         * - Flexibility: You can choose how to deal with it
          */
         static::deleting(function (Conversation $conversation) {
             $conversation->users()->detach();

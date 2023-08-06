@@ -14,6 +14,7 @@ use League\CommonMark\Extension\InlinesOnly\InlinesOnlyExtension;
 use League\CommonMark\MarkdownConverter;
 
 /**
+ * @property int $id
  * @property ?string $content
  * @property ?array $widget
  * @property int $conversation_id
@@ -111,6 +112,8 @@ class Message extends Model
 
     public function getWidgetProps(): array
     {
-        return data_get($this->widget, 'props', []);
+        return array_merge(data_get($this->widget, 'props', []), [
+            'message' => $this,
+        ]);
     }
 }
