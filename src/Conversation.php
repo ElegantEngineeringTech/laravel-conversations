@@ -2,6 +2,7 @@
 
 namespace Finller\Conversation;
 
+use Illuminate\Database\Eloquent\Casts\AsArrayObject;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -35,7 +36,7 @@ class Conversation extends Model
     ];
 
     protected $casts = [
-        'metadata' => 'array',
+        'metadata' => AsArrayObject::class,
     ];
 
     protected static function booted(): void
@@ -63,12 +64,12 @@ class Conversation extends Model
 
     public function users(): BelongsToMany
     {
-        return $this->belongsToMany(config('conversations.model_user'))->withTimestamps();
+        return $this->belongsToMany(config('conversations.model_user'))->withTimestamps()->withTrashed(); // @phpstan-ignore-line
     }
 
     public function owner(): BelongsTo
     {
-        return $this->belongsTo(config('conversations.model_user'));
+        return $this->belongsTo(config('conversations.model_user'))->withTrashed(); // @phpstan-ignore-line
     }
 
     public function messages(): HasMany

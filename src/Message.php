@@ -7,9 +7,12 @@ use Illuminate\Database\Eloquent\Casts\AsArrayObject;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Foundation\Auth\User;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\HtmlString;
 use League\CommonMark\Environment\Environment;
+use League\CommonMark\Extension\Autolink\AutolinkExtension;
+use League\CommonMark\Extension\ExternalLink\ExternalLinkExtension;
 use League\CommonMark\Extension\InlinesOnly\InlinesOnlyExtension;
 use League\CommonMark\MarkdownConverter;
 
@@ -55,7 +58,7 @@ class Message extends Model
 
     public function user(): BelongsTo
     {
-        return $this->belongsTo(config('conversations.model_user'));
+        return $this->belongsTo(config('conversations.model_user'))->withTrashed(); // @phpstan-ignore-line
     }
 
     public function markAsRead(): static
@@ -67,7 +70,12 @@ class Message extends Model
 
     public function markReadBy(int $id, ?Carbon $datetime = null): static
     {
-        data_set($this->metadata, "read_by.$id", $datetime ?? now());
+        $metadata = $this->metadata;
+
+        data_set($metadata, "read_by.$id", $datetime ?? now());
+
+        // prevent error: Indirect modification of overloaded property has no effect
+        $this->metadata = $metadata;
 
         return $this;
     }
@@ -79,11 +87,23 @@ class Message extends Model
         return $datetimeAsString ? Carbon::parse($datetimeAsString) : null;
     }
 
+    public function isReadBy(User $user): bool
+    {
+        return $this->user_id === $user->id || (bool) $this->read_at || (bool) $this->getReadBy($user->id);
+    }
+
+    public function isReadByAnyone(): bool
+    {
+        return (bool) $this->read_at || (bool) data_get($this->metadata, "read_by");
+    }
+
     public function toMarkdown(): HtmlString
     {
         $environment = new Environment(config('conversations.markdown.environment'));
 
         $environment->addExtension(new InlinesOnlyExtension);
+        $environment->addExtension(new AutolinkExtension);
+        $environment->addExtension(new ExternalLinkExtension);
 
         $converter = new MarkdownConverter($environment);
 
