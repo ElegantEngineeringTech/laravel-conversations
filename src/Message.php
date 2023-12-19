@@ -43,7 +43,7 @@ class Message extends Model
     protected $casts = [
         'metadata' => AsArrayObject::class,
         'read_at' => 'datetime',
-        'widget' => 'array'
+        'widget' => 'array',
     ];
 
     /**
@@ -68,7 +68,7 @@ class Message extends Model
         return $this;
     }
 
-    public function markReadBy(int $id, ?Carbon $datetime = null): static
+    public function markReadBy(int $id, Carbon $datetime = null): static
     {
         $metadata = $this->metadata;
 
@@ -94,20 +94,7 @@ class Message extends Model
 
     public function isReadByAnyone(): bool
     {
-        return (bool) $this->read_at || (bool) data_get($this->metadata, "read_by");
-    }
-
-    public function toMarkdown(): HtmlString
-    {
-        $environment = new Environment(config('conversations.markdown.environment'));
-
-        $environment->addExtension(new InlinesOnlyExtension);
-        $environment->addExtension(new AutolinkExtension);
-        $environment->addExtension(new ExternalLinkExtension);
-
-        $converter = new MarkdownConverter($environment);
-
-        return new HtmlString($converter->convert($this->content)->getContent());
+        return (bool) $this->read_at || (bool) data_get($this->metadata, 'read_by');
     }
 
     public function hasWidget(): bool
@@ -117,7 +104,7 @@ class Message extends Model
 
     public function getWidgetComponent(): ?string
     {
-        return data_get($this->widget, "component");
+        return data_get($this->widget, 'component');
     }
 
     public function setWidget(string $componentName, array $props): static
@@ -135,5 +122,27 @@ class Message extends Model
         return array_merge(data_get($this->widget, 'props', []), [
             'message' => $this,
         ]);
+    }
+
+    public static function markdown(?string $value): ?HtmlString
+    {
+        if (! $value) {
+            return null;
+        }
+
+        $environment = new Environment(config('conversations.markdown.environment'));
+
+        $environment->addExtension(new InlinesOnlyExtension);
+        $environment->addExtension(new AutolinkExtension);
+        $environment->addExtension(new ExternalLinkExtension);
+
+        $converter = new MarkdownConverter($environment);
+
+        return new HtmlString($converter->convert($value)->getContent());
+    }
+
+    public function toMarkdown(): HtmlString
+    {
+        return static::markdown($this->content);
     }
 }

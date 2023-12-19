@@ -5,7 +5,6 @@
 use Finller\Conversation\Conversation;
 use Finller\Conversation\Message;
 use Illuminate\Foundation\Auth\User;
-use League\CommonMark\Extension\InlinesOnly\InlinesOnlyExtension;
 
 return [
 
