@@ -12,9 +12,11 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Foundation\Auth\User;
+use Illuminate\Support\Str;
 
 /**
  * @property int $id
+ * @property string $uuid
  * @property Collection $users
  * @property ?int $owner_id
  * @property ?User $owner
@@ -30,10 +32,7 @@ class Conversation extends Model
 {
     use HasFactory;
 
-    protected $fillable = [
-        'owner_id',
-        'metadata',
-    ];
+    protected $guarded = [];
 
     protected $casts = [
         'metadata' => AsArrayObject::class,
@@ -41,6 +40,12 @@ class Conversation extends Model
 
     protected static function booted(): void
     {
+        static::creating(function (Conversation $conversation) {
+            if (empty($conversation->uuid)) {
+                $conversation->uuid = (string) Str::uuid();
+            }
+        });
+
         /**
          * Cleanup pivot records
          * We choose to not use onCascade Delete at the database level for 3 reasons:

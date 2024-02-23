@@ -20,8 +20,8 @@ class ConversationServiceProvider extends PackageServiceProvider
                 'create_conversations_table',
                 'create_messages_table',
                 'create_conversation_user_table',
+                'add_uuid_to_conversations_table',
             ])
-            ->hasConfigFile()
-            ->runsMigrations();
+            ->hasConfigFile();
     }
 }
