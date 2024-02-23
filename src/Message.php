@@ -68,7 +68,7 @@ class Message extends Model
         return $this;
     }
 
-    public function markReadBy(int $id, Carbon $datetime = null): static
+    public function markReadBy(int $id, ?Carbon $datetime = null): static
     {
         $metadata = $this->metadata;
 
