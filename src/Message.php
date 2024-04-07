@@ -2,13 +2,13 @@
 
 namespace Finller\Conversation;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Casts\ArrayObject;
 use Illuminate\Database\Eloquent\Casts\AsArrayObject;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Foundation\Auth\User;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\HtmlString;
 use League\CommonMark\Environment\Environment;
 use League\CommonMark\Extension\Autolink\AutolinkExtension;
@@ -31,14 +31,7 @@ class Message extends Model
 {
     use HasFactory;
 
-    protected $fillable = [
-        'content',
-        'conversation_id',
-        'user_id',
-        'read_at',
-        'metadata',
-        'widget',
-    ];
+    protected $guarded = [];
 
     protected $casts = [
         'metadata' => AsArrayObject::class,
@@ -46,10 +39,7 @@ class Message extends Model
         'widget' => 'array',
     ];
 
-    /**
-     * Update conversation updated_at when a message is saved
-     */
-    protected $touches = ['conversation'];
+    protected $touches = [];
 
     public function conversation(): BelongsTo
     {

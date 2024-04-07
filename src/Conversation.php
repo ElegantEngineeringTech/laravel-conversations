@@ -2,6 +2,7 @@
 
 namespace Finller\Conversation;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Casts\AsArrayObject;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -27,6 +28,8 @@ use Illuminate\Support\Str;
  * @property ?Model $conversationable
  * @property ?int $conversationable_id
  * @property ?string $conversationable_type
+ * @property ?Carbon $messaged_at
+ * @property ?int $latest_message_id
  */
 class Conversation extends Model
 {
@@ -36,6 +39,7 @@ class Conversation extends Model
 
     protected $casts = [
         'metadata' => AsArrayObject::class,
+        'messaged_at' => 'datetime',
     ];
 
     protected static function booted(): void
@@ -69,7 +73,12 @@ class Conversation extends Model
 
     public function users(): BelongsToMany
     {
-        return $this->belongsToMany(config('conversations.model_user'))->withTimestamps()->withTrashed(); // @phpstan-ignore-line
+        // @phpstan-ignore-next-line
+        return $this->belongsToMany(config('conversations.model_user'))
+            ->using(config('conversations.model_conversation_user'))
+            ->withPivot(['id', 'conversation_id', 'user_id', 'muted_at', 'archived_at', 'metadata'])
+            ->withTimestamps()
+            ->withTrashed();
     }
 
     public function owner(): BelongsTo
@@ -90,5 +99,21 @@ class Conversation extends Model
     public function oldestMessage(): HasOne
     {
         return $this->hasOne(config('conversations.model_message'))->oldestOfMany();
+    }
+
+    public function denormalizedLatestMessage(): BelongsTo
+    {
+        return $this->belongsTo(config('conversations.model_message'), 'latest_message_id');
+    }
+
+    public function send(Message $message): static
+    {
+        $this->messages()->save($message);
+
+        $this->latest_message_id = $message->id;
+        $this->messaged_at = $message->created_at->clone();
+        $this->save();
+
+        return $this;
     }
 }

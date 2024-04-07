@@ -3,6 +3,7 @@
 // config for Finller/Conversation
 
 use Finller\Conversation\Conversation;
+use Finller\Conversation\ConversationUser;
 use Finller\Conversation\Message;
 use Illuminate\Foundation\Auth\User;
 
@@ -16,6 +17,8 @@ return [
     'model_message' => Message::class,
 
     'model_conversation' => Conversation::class,
+
+    'model_conversation_user' => ConversationUser::class,
 
     /**
      * When a User is deleted, his messages will be deleted

@@ -16,12 +16,16 @@ class ConversationServiceProvider extends PackageServiceProvider
          */
         $package
             ->name('laravel-conversations')
+            ->hasConfigFile()
             ->hasMigrations([
                 'create_conversations_table',
                 'create_messages_table',
                 'create_conversation_user_table',
                 'add_uuid_to_conversations_table',
             ])
-            ->hasConfigFile();
+            ->hasMigrations([
+                'add_muted_at_column_to_conversation_user_table',
+                'add_messaged_at_column_to_conversations_table',
+            ]);
     }
 }

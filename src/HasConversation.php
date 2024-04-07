@@ -14,7 +14,7 @@ trait HasConversation
     {
         static::deleting(function (Model $model) {
             if (config('conversations.cascade_conversationable_delete_to_conversation')) {
-                $model->conversation()->delete();
+                $model->conversation->delete();
             }
         });
     }
