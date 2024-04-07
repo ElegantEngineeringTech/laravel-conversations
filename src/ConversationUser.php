@@ -3,13 +3,17 @@
 namespace Finller\Conversation;
 
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Casts\ArrayObject;
 use Illuminate\Database\Eloquent\Casts\AsArrayObject;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 
 /**
  * @property int $id
- * @property Carbon $muted_at
- * @property Carbon $archived_at
+ * @property int $conversation_id
+ * @property int $user_id
+ * @property ?Carbon $muted_at
+ * @property ?Carbon $archived_at
+ * @property ?ArrayObject $metadata
  * @property Carbon $updated_at
  * @property Carbon $created_at
  */
