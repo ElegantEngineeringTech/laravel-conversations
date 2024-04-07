@@ -29,8 +29,7 @@ trait ParticipateToConversations
         return $this->belongsToMany(config('conversations.model_conversation'))
             ->using(config('conversations.model_conversation_user'))
             ->withPivot(['id', 'conversation_id', 'user_id', 'muted_at', 'archived_at', 'metadata'])
-            ->withTimestamps()
-            ->orderBy('conversations.messaged_at', 'desc');
+            ->withTimestamps();
     }
 
     public function conversationsNotMuted(): BelongsToMany
