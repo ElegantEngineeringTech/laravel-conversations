@@ -28,7 +28,6 @@ class ConversationServiceProvider extends PackageServiceProvider
                 'add_messaged_at_column_to_conversations_table',
             ])
             ->hasMigrations([
-                'add_soft_deletes_to_messages_table',
                 'add_origin_to_messages_table',
             ]);
     }
