@@ -8,7 +8,6 @@ use Illuminate\Database\Eloquent\Casts\AsArrayObject;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User;
 use Illuminate\Support\HtmlString;
 use League\CommonMark\Environment\Environment;
@@ -27,13 +26,12 @@ use League\CommonMark\MarkdownConverter;
  * @property ?Carbon $read_at
  * @property ?ArrayObject $metadata
  * @property Conversation $conversation
- * @property ?Carbon $deleted_at
  * @property ?string $origin
+ * @property ?Carbon $deleted_at
  */
 class Message extends Model
 {
     use HasFactory;
-    use SoftDeletes;
 
     protected $guarded = [];
 
