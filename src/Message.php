@@ -134,7 +134,7 @@ class Message extends Model
         return new HtmlString($converter->convert($value)->getContent());
     }
 
-    public function toMarkdown(): HtmlString
+    public function toMarkdown(): ?HtmlString
     {
         return static::markdown($this->content);
     }
