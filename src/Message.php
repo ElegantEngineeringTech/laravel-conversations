@@ -28,6 +28,7 @@ use League\CommonMark\MarkdownConverter;
  * @template TUser of User
  *
  * @property int $id
+ * @property string $uuid
  * @property ?string $origin
  * @property ?string $content
  * @property ?array{ component: string, props: array<array-key, mixed> } $widget
