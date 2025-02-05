@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Finller\Conversation\Database\Factories;
 
 use Finller\Conversation\Message;

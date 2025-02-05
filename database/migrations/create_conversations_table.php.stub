@@ -10,9 +10,17 @@ return new class extends Migration
     {
         Schema::create('conversations', function (Blueprint $table) {
             $table->id();
+            $table->uuid()->unique();
+
             $table->foreignId('owner_id')->nullable();
             $table->nullableMorphs('conversationable');
+
+            $table->string('origin')->nullable();
+            $table->foreignId('latest_message_id')->nullable();
+            $table->datetime('messaged_at')->nullable();
+
             $table->json('metadata')->nullable();
+
             $table->timestamps();
         });
     }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Finller\Conversation;
 
 use Carbon\Carbon;
@@ -11,9 +13,10 @@ use Illuminate\Database\Eloquent\Relations\Pivot;
  * @property int $id
  * @property int $conversation_id
  * @property int $user_id
+ * @property int $last_read_message_id
+ * @property ?ArrayObject $metadata
  * @property ?Carbon $muted_at
  * @property ?Carbon $archived_at
- * @property ?ArrayObject $metadata
  * @property Carbon $updated_at
  * @property Carbon $created_at
  */

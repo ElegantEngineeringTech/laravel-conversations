@@ -1,10 +1,11 @@
 <?php
 
-// config for Finller/Conversation
+declare(strict_types=1);
 
 use Finller\Conversation\Conversation;
 use Finller\Conversation\ConversationUser;
 use Finller\Conversation\Message;
+use Finller\Conversation\Read;
 use Illuminate\Foundation\Auth\User;
 
 return [
@@ -19,6 +20,8 @@ return [
     'model_conversation' => Conversation::class,
 
     'model_conversation_user' => ConversationUser::class,
+
+    'model_read' => Read::class,
 
     /**
      * When a User is deleted, his messages will be deleted

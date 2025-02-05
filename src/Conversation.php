@@ -1,8 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Finller\Conversation;
 
 use Carbon\Carbon;
+use Finller\Conversation\Concerns\HasUuid;
 use Illuminate\Database\Eloquent\Casts\AsArrayObject;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -13,27 +16,33 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Foundation\Auth\User;
-use Illuminate\Support\Str;
 
 /**
+ * @template TUser of User
+ * @template TMessage of Message
+ * @template TConversationUser of ConversationUser
+ *
  * @property int $id
  * @property string $uuid
- * @property Collection $users
  * @property ?int $owner_id
- * @property ?User $owner
- * @property Collection<int, Message> $messages
- * @property Collection<int, User> $users
- * @property ?Message $latestMessage
- * @property ?Message $oldestMessage
- * @property ?Model $conversationable
+ * @property ?TUser $owner
  * @property ?int $conversationable_id
  * @property ?string $conversationable_type
+ * @property ?Model $conversationable
+ * @property Collection<int, TUser> $users
+ * @property Collection<int, TMessage> $messages
+ * @property ?TMessage $denormalizedLatestMessage
+ * @property ?TMessage $latestMessage
+ * @property ?TMessage $oldestMessage
  * @property ?Carbon $messaged_at
  * @property ?int $latest_message_id
+ * @property Carbon $updated_at
+ * @property Carbon $created_at
  */
 class Conversation extends Model
 {
     use HasFactory;
+    use HasUuid;
 
     protected $guarded = [];
 
@@ -44,12 +53,6 @@ class Conversation extends Model
 
     protected static function booted(): void
     {
-        static::creating(function (Conversation $conversation) {
-            if (empty($conversation->uuid)) {
-                $conversation->uuid = (string) Str::uuid();
-            }
-        });
-
         /**
          * Cleanup pivot records
          * We choose to not use onCascade Delete at the database level for 3 reasons:
@@ -57,7 +60,7 @@ class Conversation extends Model
          * - Compatibility with cloud database like PlanetScale and Vitess
          * - Flexibility: You can choose how to deal with it
          */
-        static::deleting(function (Conversation $conversation) {
+        static::deleting(function (self $conversation) {
             $conversation->users()->detach();
 
             if (config('conversations.cascade_conversation_delete_to_messages')) {
@@ -66,47 +69,93 @@ class Conversation extends Model
         });
     }
 
+    /**
+     * @return class-string<TMessage>
+     */
+    public static function getModelMessage(): string
+    {
+        return config()->string('conversations.model_message');
+    }
+
+    /**
+     * @return class-string<TUser>
+     */
+    public static function getModelUser(): string
+    {
+        return config()->string('conversations.model_user');
+    }
+
+    /**
+     * @return class-string<TConversationUser>
+     */
+    public static function getModelConversationUser(): string
+    {
+        return config()->string('conversations.model_conversation_user');
+    }
+
+    /**
+     * @return MorphTo<Model, $this>
+     */
     public function conversationable(): MorphTo
     {
         return $this->morphTo();
     }
 
+    /**
+     * @return BelongsToMany<TUser, $this>
+     */
     public function users(): BelongsToMany
     {
-        // @phpstan-ignore-next-line
-        return $this->belongsToMany(config('conversations.model_user'))
-            ->using(config('conversations.model_conversation_user'))
-            ->withPivot(['id', 'conversation_id', 'user_id', 'muted_at', 'archived_at', 'metadata'])
-            ->withTimestamps()
-            ->withTrashed();
+        return $this->belongsToMany(static::getModelUser())
+            ->using(static::getModelConversationUser())
+            ->withPivot(['id', 'last_read_message_id', 'muted_at', 'archived_at', 'conversation_id', 'user_id', 'metadata'])
+            ->withTimestamps();
     }
 
+    /**
+     * @return BelongsTo<TUser, $this>
+     */
     public function owner(): BelongsTo
     {
-        return $this->belongsTo(config('conversations.model_user'))->withTrashed(); // @phpstan-ignore-line
+        return $this->belongsTo(static::getModelUser());
     }
 
+    /**
+     * @return HasMany<TMessage, $this>
+     */
     public function messages(): HasMany
     {
-        return $this->hasMany(config('conversations.model_message'));
+        return $this->hasMany(static::getModelMessage());
     }
 
+    /**
+     * @return HasOne<TMessage, $this>
+     */
     public function latestMessage(): HasOne
     {
-        return $this->hasOne(config('conversations.model_message'))->latestOfMany();
+        return $this->hasOne(static::getModelMessage())->latestOfMany();
     }
 
+    /**
+     * @return HasOne<TMessage, $this>
+     */
     public function oldestMessage(): HasOne
     {
-        return $this->hasOne(config('conversations.model_message'))->oldestOfMany();
+        return $this->hasOne(static::getModelMessage())->oldestOfMany();
     }
 
+    /**
+     * @return BelongsTo<TMessage, $this>
+     */
     public function denormalizedLatestMessage(): BelongsTo
     {
-        return $this->belongsTo(config('conversations.model_message'), 'latest_message_id');
+        return $this->belongsTo(static::getModelMessage(), 'latest_message_id');
     }
 
-    public function send(Message $message): static
+    /**
+     * @param  TMessage  $message
+     */
+    public function sendMessage(Message $message): static
     {
         $this->messages()->save($message);
 

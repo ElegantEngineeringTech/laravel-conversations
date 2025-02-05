@@ -1,13 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Finller\Conversation;
 
 use Carbon\Carbon;
+use Finller\Conversation\Concerns\HasUuid;
 use Illuminate\Database\Eloquent\Casts\ArrayObject;
 use Illuminate\Database\Eloquent\Casts\AsArrayObject;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User;
 use Illuminate\Support\HtmlString;
 use League\CommonMark\Environment\Environment;
@@ -17,21 +22,28 @@ use League\CommonMark\Extension\InlinesOnly\InlinesOnlyExtension;
 use League\CommonMark\MarkdownConverter;
 
 /**
+ * @template TRead of Read
+ * @template TConversation of Conversation
+ * @template TUser of User
+ *
  * @property int $id
+ * @property ?string $origin
  * @property ?string $content
  * @property ?array $widget
  * @property int $conversation_id
+ * @property TConversation $conversation
  * @property ?int $user_id
+ * @property ?TUser $user
+ * @property Collection<int, Read> $reads
+ * @property ?ArrayObject $metadata
  * @property ?Carbon $created_at
  * @property ?Carbon $read_at
- * @property ?ArrayObject $metadata
- * @property Conversation $conversation
- * @property ?string $origin
  * @property ?Carbon $deleted_at
  */
 class Message extends Model
 {
     use HasFactory;
+    use HasUuid;
 
     protected $guarded = [];
 
@@ -42,16 +54,52 @@ class Message extends Model
         'widget' => 'array',
     ];
 
-    protected $touches = [];
-
-    public function conversation(): BelongsTo
+    /**
+     * @return class-string<TConversation>
+     */
+    public static function getModelConversation(): string
     {
-        return $this->belongsTo(config('conversations.model_conversation'));
+        return config()->string('conversations.model_conversation');
     }
 
+    /**
+     * @return class-string<TUser>
+     */
+    public static function getModelUser(): string
+    {
+        return config()->string('conversations.model_user');
+    }
+
+    /**
+     * @return class-string<TRead>
+     */
+    public static function getModelRead(): string
+    {
+        return config()->string('conversations.model_read');
+    }
+
+    /**
+     * @return BelongsTo<TConversation, $this>
+     */
+    public function conversation(): BelongsTo
+    {
+        return $this->belongsTo(static::getModelConversation());
+    }
+
+    /**
+     * @return BelongsTo<TUser, $this>
+     */
     public function user(): BelongsTo
     {
-        return $this->belongsTo(config('conversations.model_user'))->withTrashed(); // @phpstan-ignore-line
+        return $this->belongsTo(static::getModelUser());
+    }
+
+    /**
+     * @return HasMany<TRead, $this>
+     */
+    public function reads(): HasMany
+    {
+        return $this->hasMany(static::getModelRead());
     }
 
     public function markAsRead(): static
@@ -61,33 +109,68 @@ class Message extends Model
         return $this;
     }
 
-    public function markReadBy(int $id, ?Carbon $datetime = null): static
+    public function markAsUnread(): static
     {
-        $metadata = $this->metadata;
-
-        data_set($metadata, "read_by.$id", $datetime ?? now());
-
-        // prevent error: Indirect modification of overloaded property has no effect
-        $this->metadata = $metadata;
+        $this->read_at = null;
 
         return $this;
     }
 
-    public function getReadBy(int $id): ?Carbon
+    public function markAsReadBy(User|int $user, ?Carbon $date = null): static
     {
-        $datetimeAsString = data_get($this->metadata, "read_by.$id");
+        $userId = $user instanceof User ? $user->getKey() : $user;
 
-        return $datetimeAsString ? Carbon::parse($datetimeAsString) : null;
+        $read = new Read;
+        $read->user_id = $userId;
+        $read->updated_at = $date;
+        $read->created_at = $date;
+
+        $this->reads()->save($read);
+
+        if ($this->relationLoaded('reads')) {
+            $this->reads->push($read);
+        }
+
+        return $this;
     }
 
-    public function isReadBy(User $user): bool
+    public function markAsUnreadBy(User|int $user): static
     {
-        return $this->user_id === $user->id || (bool) $this->read_at || (bool) $this->getReadBy($user->id);
+        $userId = $user instanceof User ? $user->getKey() : $user;
+
+        $read = $this->reads
+            ->firstWhere('user_id', $userId);
+
+        if ($read) {
+            $read->delete();
+
+            $this->setRelation(
+                'reads',
+                $this->reads->except([$read->id])
+            );
+        }
+
+        return $this;
+    }
+
+    public function isReadBy(User|int $user): bool
+    {
+        $userId = $user instanceof User ? $user->getKey() : $user;
+
+        if ($this->user_id === $userId) {
+            return true;
+        }
+
+        if ($this->read_at) {
+            return true;
+        }
+
+        return (bool) $this->reads->firstWhere('user_id', $userId);
     }
 
     public function isReadByAnyone(): bool
     {
-        return (bool) $this->read_at || (bool) data_get($this->metadata, 'read_by');
+        return $this->read_at || $this->reads->isNotEmpty();
     }
 
     public function hasWidget(): bool

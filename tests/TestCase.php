@@ -1,10 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Finller\Conversation\Tests;
 
 use Finller\Conversation\ConversationServiceProvider;
+use Finller\Conversation\Tests\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Database\Eloquent\Model;
 use Orchestra\Testbench\TestCase as Orchestra;
+
+use function Orchestra\Testbench\package_path;
 
 class TestCase extends Orchestra
 {
@@ -24,13 +30,26 @@ class TestCase extends Orchestra
         ];
     }
 
-    public function getEnvironmentSetUp($app)
+    protected function defineEnvironment($app)
     {
-        config()->set('database.default', 'testing');
+        $app['config']->set('conversations.model_user', User::class);
 
-        /*
-        $migration = include __DIR__.'/../database/migrations/create_laravel-conversations_table.php.stub';
-        $migration->up();
-        */
+        Model::shouldBeStrict(true);
+    }
+
+    protected function defineDatabaseMigrations()
+    {
+        $this->loadMigrationsFrom(package_path('tests/migrations'));
+
+        foreach (
+            [
+                'create_conversations_table',
+                'create_messages_table',
+                'create_conversation_user_table',
+                'create_reads_table',
+            ] as $migration
+        ) {
+            (include package_path("database/migrations/{$migration}.php.stub"))->up();
+        }
     }
 }

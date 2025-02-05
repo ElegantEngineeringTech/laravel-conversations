@@ -13,22 +13,18 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('messages', function (Blueprint $table) {
+        Schema::create('reads', function (Blueprint $table) {
             $table->id();
             $table->uuid()->unique();
 
-            $table->text('content')->nullable();
+            $table->string('origin')->nullable();
 
-            $table->foreignId('conversation_id');
-            $table->foreignId('user_id')->nullable();
+            $table->foreignId('message_id');
+            $table->foreignId('user_id');
 
-            $table->dateTime('read_at')->nullable();
-
-            $table->json('widget')->nullable();
-            $table->json('metadata')->nullable();
-
-            $table->softDeletes();
             $table->timestamps();
+
+            $table->unique(['message_id', 'user_id']);
         });
     }
 
@@ -39,6 +35,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('messages');
+        Schema::dropIfExists('reads');
     }
 };
