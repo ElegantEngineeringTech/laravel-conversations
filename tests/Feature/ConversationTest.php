@@ -33,7 +33,7 @@ it('can send a message', function () {
     $message->user()->associate($user);
     $message->content = 'foo';
 
-    $conversation->sendMessage($message);
+    $conversation->send($message);
 
     expect($conversation->latest_message_id)->toBe($message->id);
     expect($conversation->messaged_at == $message->created_at)->toBe(true);
@@ -53,7 +53,7 @@ it('can read a message', function () {
     $message->user()->associate($user);
     $message->content = 'foo';
 
-    $conversation->sendMessage($message);
+    $conversation->send($message);
 
     expect($message->isReadBy($user))->toBe(true);
 

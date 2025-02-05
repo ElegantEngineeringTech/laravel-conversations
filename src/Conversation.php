@@ -155,7 +155,7 @@ class Conversation extends Model
     /**
      * @param  TMessage  $message
      */
-    public function sendMessage(Message $message): static
+    public function send(Message $message): static
     {
         $this->messages()->save($message);
 
