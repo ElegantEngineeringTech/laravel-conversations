@@ -1,9 +1,9 @@
 # Attach a conversation to any model and easily create a chat
 
-[![Latest Version on Packagist](https://img.shields.io/packagist/v/finller/laravel-conversations.svg?style=flat-square)](https://packagist.org/packages/finller/laravel-conversations)
-[![GitHub Tests Action Status](https://img.shields.io/github/actions/workflow/status/finller/laravel-conversations/run-tests.yml?branch=main&label=tests&style=flat-square)](https://github.com/finller/laravel-conversations/actions?query=workflow%3Arun-tests+branch%3Amain)
-[![GitHub Code Style Action Status](https://img.shields.io/github/actions/workflow/status/finller/laravel-conversations/fix-php-code-style-issues.yml?branch=main&label=code%20style&style=flat-square)](https://github.com/finller/laravel-conversations/actions?query=workflow%3A"Fix+PHP+code+style+issues"+branch%3Amain)
-[![Total Downloads](https://img.shields.io/packagist/dt/finller/laravel-conversations.svg?style=flat-square)](https://packagist.org/packages/finller/laravel-conversations)
+[![Latest Version on Packagist](https://img.shields.io/packagist/v/elegantly/laravel-conversations.svg?style=flat-square)](https://packagist.org/packages/elegantly/laravel-conversations)
+[![GitHub Tests Action Status](https://img.shields.io/github/actions/workflow/status/elegantly/laravel-conversations/run-tests.yml?branch=main&label=tests&style=flat-square)](https://github.com/ElegantEngineeringTech/laravel-conversations/actions?query=workflow%3Arun-tests+branch%3Amain)
+[![GitHub Code Style Action Status](https://img.shields.io/github/actions/workflow/status/elegantly/laravel-conversations/fix-php-code-style-issues.yml?branch=main&label=code%20style&style=flat-square)](https://github.com/ElegantEngineeringTech/laravel-conversations/actions?query=workflow%3A"Fix+PHP+code+style+issues"+branch%3Amain)
+[![Total Downloads](https://img.shields.io/packagist/dt/elegantly/laravel-conversations.svg?style=flat-square)](https://packagist.org/packages/elegantly/laravel-conversations)
 
 This package the basic architecture of a chat between multiple users.
 
@@ -12,7 +12,7 @@ This package the basic architecture of a chat between multiple users.
 You can install the package via composer:
 
 ```bash
-composer require finller/laravel-conversations
+composer require elegantly/laravel-conversations
 ```
 
 You can publish and run the migrations with:

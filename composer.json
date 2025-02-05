@@ -1,13 +1,13 @@
 {
-    "name": "finller/laravel-conversations",
+    "name": "elegantly/laravel-conversations",
     "description": "Attach chat to any model",
     "keywords": [
-        "finller",
+        "elegantly",
         "laravel",
         "chat",
         "laravel-conversations"
     ],
-    "homepage": "https://github.com/finller/laravel-conversations",
+    "homepage": "https://github.com/ElegantEngineeringTech/laravel-conversations",
     "license": "MIT",
     "authors": [
         {
