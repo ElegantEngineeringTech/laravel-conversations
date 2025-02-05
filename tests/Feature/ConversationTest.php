@@ -18,7 +18,7 @@ it('can have multiple participants', function () {
     $conversation->users()->attach($user2->id);
 
     expect($conversation->users)->toHaveLength(2);
-})->only();
+});
 
 it('can send a message', function () {
 
@@ -37,7 +37,7 @@ it('can send a message', function () {
 
     expect($conversation->latest_message_id)->toBe($message->id);
     expect($conversation->messaged_at == $message->created_at)->toBe(true);
-})->only();
+});
 
 it('can read a message', function () {
 
@@ -65,4 +65,4 @@ it('can read a message', function () {
     expect($message->isReadBy($user2))->toBe(true);
 
     expect($message->reads)->toHaveLength(1);
-})->only();
+});
