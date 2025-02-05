@@ -252,6 +252,7 @@ class Message extends Model
         $userId = $user instanceof User ? $user->getKey() : $user;
 
         $query
+            ->where('read_at', null)
             ->where('user_id', '!=', $userId)
             ->whereDoesntHave('reads', fn ($query) => $query->where('user_id', $userId));
     }
@@ -262,7 +263,8 @@ class Message extends Model
 
         $query->where(function (Builder $query) use ($userId) {
             $query
-                ->where('user_id', $userId)
+                ->where('read_at', '!=', null)
+                ->orWhere('user_id', $userId)
                 ->orWhereHas('reads', fn ($query) => $query->where('user_id', $userId));
         });
     }
