@@ -7,6 +7,9 @@ namespace Elegantly\Conversation\Database\Factories;
 use Elegantly\Conversation\Message;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
+/**
+ * @extends Factory<Message>
+ */
 class MessageFactory extends Factory
 {
     protected $model = Message::class;

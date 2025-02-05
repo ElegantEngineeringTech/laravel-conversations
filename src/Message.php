@@ -6,6 +6,7 @@ namespace Elegantly\Conversation;
 
 use Carbon\Carbon;
 use Elegantly\Conversation\Concerns\HasUuid;
+use Elegantly\Conversation\Database\Factories\MessageFactory;
 use Illuminate\Database\Eloquent\Casts\ArrayObject;
 use Illuminate\Database\Eloquent\Casts\AsArrayObject;
 use Illuminate\Database\Eloquent\Collection;
@@ -29,20 +30,22 @@ use League\CommonMark\MarkdownConverter;
  * @property int $id
  * @property ?string $origin
  * @property ?string $content
- * @property ?array $widget
+ * @property ?array{ component: string, props: array<array-key, mixed> } $widget
  * @property int $conversation_id
  * @property TConversation $conversation
  * @property ?int $user_id
  * @property ?TUser $user
  * @property Collection<int, Read> $reads
- * @property ?ArrayObject $metadata
+ * @property ?ArrayObject<array-key, mixed> $metadata
  * @property ?Carbon $created_at
  * @property ?Carbon $read_at
  * @property ?Carbon $deleted_at
  */
 class Message extends Model
 {
+    /** @use HasFactory<MessageFactory> */
     use HasFactory;
+
     use HasUuid;
 
     protected $guarded = [];
@@ -183,6 +186,9 @@ class Message extends Model
         return data_get($this->widget, 'component');
     }
 
+    /**
+     * @param  array<array-key, mixed>  $props
+     */
     public function setWidget(string $componentName, array $props): static
     {
         $this->widget = [
@@ -193,6 +199,9 @@ class Message extends Model
         return $this;
     }
 
+    /**
+     * @return array<array-key, mixed>
+     */
     public function getWidgetProps(): array
     {
         return array_merge(data_get($this->widget, 'props', []), [
