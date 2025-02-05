@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Finller\Conversation;
+namespace Elegantly\Conversation;
 
 use Carbon\Carbon;
-use Finller\Conversation\Concerns\HasUuid;
+use Elegantly\Conversation\Concerns\HasUuid;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Foundation\Auth\User;

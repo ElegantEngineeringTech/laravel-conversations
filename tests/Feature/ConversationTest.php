@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-use Finller\Conversation\Conversation;
-use Finller\Conversation\Message;
-use Finller\Conversation\Tests\Models\User;
+use Elegantly\Conversation\Conversation;
+use Elegantly\Conversation\Message;
+use Elegantly\Conversation\Tests\Models\User;
 
 it('can have multiple participants', function () {
 

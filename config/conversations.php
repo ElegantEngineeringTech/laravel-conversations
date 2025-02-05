@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-use Finller\Conversation\Conversation;
-use Finller\Conversation\ConversationUser;
-use Finller\Conversation\Message;
-use Finller\Conversation\Read;
+use Elegantly\Conversation\Conversation;
+use Elegantly\Conversation\ConversationUser;
+use Elegantly\Conversation\Message;
+use Elegantly\Conversation\Read;
 use Illuminate\Foundation\Auth\User;
 
 return [

@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Finller\Conversation\Database\Factories;
+namespace Elegantly\Conversation\Database\Factories;
 
-use Finller\Conversation\Message;
+use Elegantly\Conversation\Message;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class MessageFactory extends Factory

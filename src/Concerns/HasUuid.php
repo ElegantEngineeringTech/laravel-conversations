@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Finller\Conversation\Concerns;
+namespace Elegantly\Conversation\Concerns;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;

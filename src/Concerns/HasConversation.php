@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Finller\Conversation\Concerns;
+namespace Elegantly\Conversation\Concerns;
 
-use Finller\Conversation\Conversation;
+use Elegantly\Conversation\Conversation;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 

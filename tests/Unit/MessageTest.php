@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 use Carbon\Carbon;
-use Finller\Conversation\Message;
+use Elegantly\Conversation\Message;
 
 it('can mark message read by a user', function () {
     $USER_ID = 102;

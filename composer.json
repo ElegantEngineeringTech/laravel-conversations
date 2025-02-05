@@ -35,13 +35,13 @@
     },
     "autoload": {
         "psr-4": {
-            "Finller\\Conversation\\": "src",
-            "Finller\\Conversation\\Database\\Factories\\": "database/factories"
+            "Elegantly\\Conversation\\": "src",
+            "Elegantly\\Conversation\\Database\\Factories\\": "database/factories"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Finller\\Conversation\\Tests\\": "tests",
+            "Elegantly\\Conversation\\Tests\\": "tests",
             "Workbench\\App\\": "workbench/app/",
             "Workbench\\Database\\Factories\\": "workbench/database/factories/",
             "Workbench\\Database\\Seeders\\": "workbench/database/seeders/"
@@ -79,7 +79,7 @@
     "extra": {
         "laravel": {
             "providers": [
-                "Finller\\Conversation\\ConversationServiceProvider"
+                "Elegantly\\Conversation\\ConversationServiceProvider"
             ]
         }
     },

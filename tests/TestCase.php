@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Finller\Conversation\Tests;
+namespace Elegantly\Conversation\Tests;
 
-use Finller\Conversation\ConversationServiceProvider;
-use Finller\Conversation\Tests\Models\User;
+use Elegantly\Conversation\ConversationServiceProvider;
+use Elegantly\Conversation\Tests\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Database\Eloquent\Model;
 use Orchestra\Testbench\TestCase as Orchestra;
@@ -19,7 +19,7 @@ class TestCase extends Orchestra
         parent::setUp();
 
         Factory::guessFactoryNamesUsing(
-            fn (string $modelName) => 'Finller\\Conversation\\Database\\Factories\\'.class_basename($modelName).'Factory'
+            fn (string $modelName) => 'Elegantly\\Conversation\\Database\\Factories\\'.class_basename($modelName).'Factory'
         );
     }
 

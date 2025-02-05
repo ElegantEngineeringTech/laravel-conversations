@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Finller\Conversation\Concerns;
+namespace Elegantly\Conversation\Concerns;
 
-use Finller\Conversation\Conversation;
-use Finller\Conversation\ConversationUser;
-use Finller\Conversation\Message;
+use Elegantly\Conversation\Conversation;
+use Elegantly\Conversation\ConversationUser;
+use Elegantly\Conversation\Message;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Finller\Conversation;
+namespace Elegantly\Conversation;
 
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;

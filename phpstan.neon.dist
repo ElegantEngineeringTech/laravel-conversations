@@ -13,4 +13,4 @@ parameters:
     checkModelAppends: false
     noEnvCallsOutsideOfConfig: false
     ignoreErrors:
-        - '#Trait Finller\\Conversation\\Concerns\\[a-zA-Z0-9\\_]+ is used zero times and is not analysed.#'
+        - '#Trait Elegantly\\Conversation\\Concerns\\[a-zA-Z0-9\\_]+ is used zero times and is not analysed.#'

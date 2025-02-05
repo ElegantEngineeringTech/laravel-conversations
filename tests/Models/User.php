@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Finller\Conversation\Tests\Models;
+namespace Elegantly\Conversation\Tests\Models;
 
-use Finller\Conversation\Concerns\ParticipateToConversations;
+use Elegantly\Conversation\Concerns\ParticipateToConversations;
 use Illuminate\Foundation\Auth\User as Authentificate;
 
 class User extends Authentificate

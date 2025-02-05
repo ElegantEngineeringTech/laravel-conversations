@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Finller\Conversation;
+namespace Elegantly\Conversation;
 
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Casts\ArrayObject;
