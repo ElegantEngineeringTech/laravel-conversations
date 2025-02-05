@@ -15,7 +15,6 @@ return new class extends Migration
             $table->foreignId('owner_id')->nullable();
             $table->nullableMorphs('conversationable');
 
-            $table->string('origin')->nullable();
             $table->foreignId('latest_message_id')->nullable();
             $table->datetime('messaged_at')->nullable();
 
