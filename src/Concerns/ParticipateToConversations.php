@@ -71,6 +71,22 @@ trait ParticipateToConversations
     /**
      * @return BelongsToMany<TConversation, $this>
      */
+    public function conversationsUnread(): BelongsToMany
+    {
+        return $this->conversations()->unread($this->id);
+    }
+
+    /**
+     * @return BelongsToMany<TConversation, $this>
+     */
+    public function conversationsRead(): BelongsToMany
+    {
+        return $this->conversations()->read($this->id);
+    }
+
+    /**
+     * @return BelongsToMany<TConversation, $this>
+     */
     public function conversationsNotMuted(): BelongsToMany
     {
         return $this->conversations()->wherePivot('muted_at', null);

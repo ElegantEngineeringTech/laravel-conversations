@@ -7,6 +7,7 @@ namespace Elegantly\Conversation;
 use Carbon\Carbon;
 use Elegantly\Conversation\Concerns\HasUuid;
 use Elegantly\Conversation\Database\Factories\MessageFactory;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\ArrayObject;
 use Illuminate\Database\Eloquent\Casts\AsArrayObject;
 use Illuminate\Database\Eloquent\Collection;
@@ -244,5 +245,25 @@ class Message extends Model
     public function toMarkdown(): ?HtmlString
     {
         return static::markdown($this->content);
+    }
+
+    public function scopeUnread(Builder $query, User|int $user): void
+    {
+        $userId = $user instanceof User ? $user->getKey() : $user;
+
+        $query
+            ->where('user_id', '!=', $userId)
+            ->whereDoesntHave('reads', fn ($query) => $query->where('user_id', $userId));
+    }
+
+    public function scopeRead(Builder $query, User|int $user): void
+    {
+        $userId = $user instanceof User ? $user->getKey() : $user;
+
+        $query->where(function (Builder $query) use ($userId) {
+            $query
+                ->where('user_id', $userId)
+                ->orWhereHas('reads', fn ($query) => $query->where('user_id', $userId));
+        });
     }
 }

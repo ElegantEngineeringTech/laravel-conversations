@@ -66,3 +66,91 @@ it('can read a message', function () {
 
     expect($message->reads)->toHaveLength(1);
 });
+
+it('query unread conversations', function () {
+
+    $conversation = new Conversation;
+    $conversation->save();
+
+    $user = User::create();
+    $user2 = User::create();
+
+    $conversation->users()->attach($user->id);
+    $conversation->users()->attach($user2->id);
+
+    $message = new Message;
+    $message->user()->associate($user);
+    $message->content = 'foo';
+
+    $conversation->send($message);
+
+    expect(
+        $user2->conversations()->unread($user2)->count()
+    )
+        ->toBe(
+            $user2->conversationsUnread()->count()
+        )
+        ->toBe(1);
+
+    expect(
+        $user->conversations()->unread($user)->count()
+    )
+        ->toBe(
+            $user->conversationsUnread()->count()
+        )
+        ->toBe(0);
+
+    $message->markAsReadBy($user2);
+
+    expect(
+        $user2->conversations()->unread($user2)->count()
+    )
+        ->toBe(
+            $user2->conversationsUnread()->count()
+        )
+        ->toBe(0);
+});
+
+it('query read conversations', function () {
+
+    $conversation = new Conversation;
+    $conversation->save();
+
+    $user = User::create();
+    $user2 = User::create();
+
+    $conversation->users()->attach($user->id);
+    $conversation->users()->attach($user2->id);
+
+    $message = new Message;
+    $message->user()->associate($user);
+    $message->content = 'foo';
+
+    $conversation->send($message);
+
+    expect(
+        $user2->conversations()->read($user2)->count()
+    )
+        ->toBe(
+            $user2->conversationsRead()->count()
+        )
+        ->toBe(0);
+
+    expect(
+        $user->conversations()->read($user)->count()
+    )
+        ->toBe(
+            $user->conversationsRead()->count()
+        )
+        ->toBe(1);
+
+    $message->markAsReadBy($user2);
+
+    expect(
+        $user2->conversations()->read($user2)->count()
+    )
+        ->toBe(
+            $user2->conversationsRead()->count()
+        )
+        ->toBe(1);
+});

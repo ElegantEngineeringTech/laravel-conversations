@@ -6,6 +6,7 @@ namespace Elegantly\Conversation;
 
 use Carbon\Carbon;
 use Elegantly\Conversation\Concerns\HasUuid;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\AsArrayObject;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -164,5 +165,19 @@ class Conversation extends Model
         $this->save();
 
         return $this;
+    }
+
+    public function scopeUnread(Builder $query, User|int $user): void
+    {
+        $userId = $user instanceof User ? $user->getKey() : $user;
+
+        $query->whereHas('denormalizedLatestMessage', fn ($query) => $query->unread($userId));
+    }
+
+    public function scopeRead(Builder $query, User|int $user): void
+    {
+        $userId = $user instanceof User ? $user->getKey() : $user;
+
+        $query->whereHas('denormalizedLatestMessage', fn ($query) => $query->read($userId));
     }
 }
