@@ -58,6 +58,20 @@ class Message extends Model
         'widget' => 'array',
     ];
 
+    protected static function booted(): void
+    {
+        static::deleting(function (self $message) {
+
+            if (method_exists($message, 'isForceDeleting')) {
+                if ($message->isForceDeleting()) {
+                    $message->reads()->delete();
+                }
+            } else {
+                $message->reads()->delete();
+            }
+        });
+    }
+
     /**
      * @return class-string<TConversation>
      */
