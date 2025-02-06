@@ -139,7 +139,7 @@ class Message extends Model
     {
         $userId = $user instanceof User ? $user->getKey() : $user;
 
-        $read = $this->reads()->firstOrNew([
+        $read = static::getModelRead()::query()->firstOrNew([
             'user_id' => $userId,
             'message_id' => $this->id,
         ]);
@@ -161,11 +161,19 @@ class Message extends Model
     {
         $userId = $user instanceof User ? $user->getKey() : $user;
 
-        $read = $this->reads->firstWhere('user_id', $userId);
+        $read = static::getModelRead()::query()->firstOrNew([
+            'user_id' => $userId,
+            'message_id' => $this->id,
+        ]);
 
-        if ($read) {
-            $read->read_at = null;
-            $read->save();
+        $read->read_at = null;
+        $read->save();
+
+        if ($this->relationLoaded('reads')) {
+            $this->setRelation(
+                'reads',
+                $this->reads->except([$read])->push($read)
+            );
         }
 
         return $this;
