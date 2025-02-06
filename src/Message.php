@@ -141,8 +141,11 @@ class Message extends Model
 
         $read = new Read;
         $read->user_id = $userId;
-        $read->updated_at = $date;
-        $read->created_at = $date;
+
+        if ($date) {
+            $read->updated_at = $date;
+            $read->created_at = $date;
+        }
 
         $this->reads()->save($read);
 

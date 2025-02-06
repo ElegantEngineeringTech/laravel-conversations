@@ -7,9 +7,14 @@ namespace Elegantly\Conversation;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Casts\ArrayObject;
 use Illuminate\Database\Eloquent\Casts\AsArrayObject;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\Pivot;
+use Illuminate\Foundation\Auth\User;
 
 /**
+ * @template TConversation of Conversation
+ * @template TUser of User
+ *
  * @property int $id
  * @property int $conversation_id
  * @property int $user_id
@@ -29,6 +34,38 @@ class ConversationUser extends Pivot
         'archived_at' => 'datetime',
         'metadata' => AsArrayObject::class,
     ];
+
+    /**
+     * @return class-string<TUser>
+     */
+    public static function getModelUser(): string
+    {
+        return config()->string('conversations.model_user');
+    }
+
+    /**
+     * @return class-string<TConversation>
+     */
+    public static function getModelConversation(): string
+    {
+        return config()->string('conversations.model_conversation');
+    }
+
+    /**
+     * @return BelongsTo<TUser>
+     */
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(static::getModelUser());
+    }
+
+    /**
+     * @return BelongsTo<TConversation>
+     */
+    public function conversation(): BelongsTo
+    {
+        return $this->belongsTo(static::getModelConversation());
+    }
 
     public function markAsDenormalizedRead(Message|int $message): static
     {
