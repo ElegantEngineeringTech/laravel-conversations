@@ -139,18 +139,19 @@ class Message extends Model
     {
         $userId = $user instanceof User ? $user->getKey() : $user;
 
-        $read = new MessageRead;
-        $read->user_id = $userId;
+        $read = $this->reads()->firstOrNew([
+            'user_id' => $userId,
+            'message_id' => $this->id,
+        ]);
 
-        if ($date) {
-            $read->updated_at = $date;
-            $read->created_at = $date;
-        }
-
-        $this->reads()->save($read);
+        $read->read_at = $date ?? now();
+        $read->save();
 
         if ($this->relationLoaded('reads')) {
-            $this->reads->push($read);
+            $this->setRelation(
+                'reads',
+                $this->reads->except([$read])->push($read)
+            );
         }
 
         return $this;
@@ -160,16 +161,11 @@ class Message extends Model
     {
         $userId = $user instanceof User ? $user->getKey() : $user;
 
-        $read = $this->reads
-            ->firstWhere('user_id', $userId);
+        $read = $this->reads->firstWhere('user_id', $userId);
 
         if ($read) {
-            $read->delete();
-
-            $this->setRelation(
-                'reads',
-                $this->reads->except([$read->id])
-            );
+            $read->read_at = null;
+            $read->save();
         }
 
         return $this;
@@ -187,12 +183,14 @@ class Message extends Model
             return true;
         }
 
-        return (bool) $this->reads->firstWhere('user_id', $userId);
+        return (bool) $this->reads->firstWhere(function ($read) use ($userId) {
+            return $read->user_id === $userId && $read->read_at !== null;
+        });
     }
 
     public function isReadByAnyone(): bool
     {
-        return $this->read_at || $this->reads->isNotEmpty();
+        return $this->read_at || $this->reads->where('reat_at', '!=', null)->isNotEmpty();
     }
 
     public function hasWidget(): bool
@@ -257,7 +255,12 @@ class Message extends Model
         $query
             ->where('read_at', null)
             ->where('user_id', '!=', $userId)
-            ->whereDoesntHave('reads', fn ($query) => $query->where('user_id', $userId));
+            ->whereDoesntHave(
+                'reads',
+                fn ($query) => $query
+                    ->where('user_id', $userId)
+                    ->where('reat_at', '!=', null)
+            );
     }
 
     public function scopeRead(Builder $query, User|int $user): void
@@ -268,7 +271,12 @@ class Message extends Model
             $query
                 ->where('read_at', '!=', null)
                 ->orWhere('user_id', $userId)
-                ->orWhereHas('reads', fn ($query) => $query->where('user_id', $userId));
+                ->orWhereHas(
+                    'reads',
+                    fn ($query) => $query
+                        ->where('user_id', $userId)
+                        ->where('reat_at', '!=', null)
+                );
         });
     }
 }
