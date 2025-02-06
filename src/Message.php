@@ -198,7 +198,7 @@ class Message extends Model
 
     public function isReadByAnyone(): bool
     {
-        return $this->read_at || $this->reads->where('reat_at', '!=', null)->isNotEmpty();
+        return $this->read_at || $this->reads->where('read_at', '!=', null)->isNotEmpty();
     }
 
     public function hasWidget(): bool
