@@ -32,11 +32,12 @@ use Illuminate\Foundation\Auth\User;
  * @property ?Model $conversationable
  * @property Collection<int, TUser> $users
  * @property Collection<int, TMessage> $messages
- * @property ?TMessage $denormalizedLatestMessage
  * @property ?TMessage $latestMessage
  * @property ?TMessage $oldestMessage
+ * @property ?TConversationUser $conversationUser User Pivot
  * @property ?Carbon $messaged_at
  * @property ?int $latest_message_id
+ * @property ?TMessage $denormalizedLatestMessage
  * @property Carbon $updated_at
  * @property Carbon $created_at
  */
@@ -108,6 +109,7 @@ class Conversation extends Model
     public function users(): BelongsToMany
     {
         return $this->belongsToMany(static::getModelUser())
+            ->as('conversationUser')
             ->using(static::getModelConversationUser())
             ->withPivot(['id', 'last_read_message_id', 'muted_at', 'archived_at', 'conversation_id', 'user_id', 'metadata'])
             ->withTimestamps();
@@ -163,6 +165,27 @@ class Conversation extends Model
         $this->latest_message_id = $message->id;
         $this->messaged_at = $message->created_at->clone();
         $this->save();
+
+        return $this;
+    }
+
+    /**
+     * Update `last_read_message_id` pivot value
+     */
+    public function markAsDenormalizedReadBy(User|int $user): static
+    {
+        /** @var int $userId */
+        $userId = $user instanceof User ? $user->getKey() : $user;
+
+        /** @var ?ConversationUser $pivot */
+        // @phpstan-ignore-next-line
+        $pivot = $this->users->find($userId)?->conversationUser;
+
+        if ($pivot) {
+            $pivot
+                ->markAsDenormalizedRead($this->latest_message_id)
+                ->save();
+        }
 
         return $this;
     }

@@ -19,10 +19,11 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * @property Collection<int, TConversation> $conversations
  * @property Collection<int, TMessage> $messages
  * @property ?TMessage $latestMessage
+ * @property ?TConversationUser $conversationUser Conversation Pivot
  */
-trait ParticipateToConversations
+trait HasConversationsTrait
 {
-    protected static function bootParticipateToConversations(): void
+    protected static function bootHasConversationsTrait(): void
     {
         static::deleting(function ($model) {
             $model->conversations()->detach();
@@ -63,6 +64,7 @@ trait ParticipateToConversations
     public function conversations(): BelongsToMany
     {
         return $this->belongsToMany(static::getModelConversation())
+            ->as('conversationUser')
             ->using(static::getModelConversationUser())
             ->withPivot(['id', 'last_read_message_id', 'muted_at', 'archived_at', 'conversation_id', 'user_id', 'metadata'])
             ->withTimestamps();
