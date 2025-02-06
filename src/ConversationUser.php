@@ -52,7 +52,7 @@ class ConversationUser extends Pivot
     }
 
     /**
-     * @return BelongsTo<TUser>
+     * @return BelongsTo<TUser, $this>
      */
     public function user(): BelongsTo
     {
@@ -60,7 +60,7 @@ class ConversationUser extends Pivot
     }
 
     /**
-     * @return BelongsTo<TConversation>
+     * @return BelongsTo<TConversation, $this>
      */
     public function conversation(): BelongsTo
     {
