@@ -23,7 +23,7 @@ class ConversationServiceProvider extends PackageServiceProvider
                 'create_conversations_table',
                 'create_messages_table',
                 'create_conversation_user_table',
-                'create_reads_table',
+                'create_message_reads_table',
             ]);
     }
 }

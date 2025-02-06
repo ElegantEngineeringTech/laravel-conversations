@@ -13,7 +13,7 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('reads', function (Blueprint $table) {
+        Schema::create('message_reads', function (Blueprint $table) {
             $table->id();
             $table->uuid()->unique();
 
@@ -21,6 +21,8 @@ return new class extends Migration
 
             $table->foreignId('message_id');
             $table->foreignId('user_id');
+
+            $table->dateTime('read_at')->nullable();
 
             $table->timestamps();
 
@@ -35,6 +37,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('reads');
+        Schema::dropIfExists('message_reads');
     }
 };

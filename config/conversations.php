@@ -5,7 +5,7 @@ declare(strict_types=1);
 use Elegantly\Conversation\Conversation;
 use Elegantly\Conversation\ConversationUser;
 use Elegantly\Conversation\Message;
-use Elegantly\Conversation\Read;
+use Elegantly\Conversation\MessageRead;
 use Illuminate\Foundation\Auth\User;
 
 return [
@@ -21,7 +21,7 @@ return [
 
     'model_conversation_user' => ConversationUser::class,
 
-    'model_read' => Read::class,
+    'model_read' => MessageRead::class,
 
     /**
      * When a User is deleted, his messages will be deleted

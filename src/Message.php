@@ -24,7 +24,7 @@ use League\CommonMark\Extension\InlinesOnly\InlinesOnlyExtension;
 use League\CommonMark\MarkdownConverter;
 
 /**
- * @template TRead of Read
+ * @template TMessageRead of MessageRead
  * @template TConversation of Conversation
  * @template TUser of User
  *
@@ -37,7 +37,7 @@ use League\CommonMark\MarkdownConverter;
  * @property TConversation $conversation
  * @property ?int $user_id
  * @property ?TUser $user
- * @property Collection<int, Read> $reads
+ * @property Collection<int, MessageRead> $reads
  * @property ?ArrayObject<array-key, mixed> $metadata
  * @property ?Carbon $created_at
  * @property ?Carbon $read_at
@@ -90,7 +90,7 @@ class Message extends Model
     }
 
     /**
-     * @return class-string<TRead>
+     * @return class-string<TMessageRead>
      */
     public static function getModelRead(): string
     {
@@ -114,7 +114,7 @@ class Message extends Model
     }
 
     /**
-     * @return HasMany<TRead, $this>
+     * @return HasMany<TMessageRead, $this>
      */
     public function reads(): HasMany
     {
@@ -139,7 +139,7 @@ class Message extends Model
     {
         $userId = $user instanceof User ? $user->getKey() : $user;
 
-        $read = new Read;
+        $read = new MessageRead;
         $read->user_id = $userId;
 
         if ($date) {

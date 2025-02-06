@@ -16,6 +16,7 @@ use Illuminate\Foundation\Auth\User;
  *
  * @property int $id
  * @property ?string $origin
+ * @property ?Carbon $read_at
  * @property int $message_id
  * @property TMessage $message
  * @property int $user_id
@@ -23,11 +24,15 @@ use Illuminate\Foundation\Auth\User;
  * @property Carbon $updated_at
  * @property Carbon $created_at
  */
-class Read extends Model
+class MessageRead extends Model
 {
     use HasUuid;
 
     protected $guarded = [];
+
+    protected $casts = [
+        'read_at' => 'datetime',
+    ];
 
     /**
      * @return class-string<TUser>
