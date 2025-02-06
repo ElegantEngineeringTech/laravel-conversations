@@ -267,7 +267,7 @@ class Message extends Model
                 'reads',
                 fn ($query) => $query
                     ->where('user_id', $userId)
-                    ->where('reat_at', '!=', null)
+                    ->where('read_at', '!=', null)
             );
     }
 
@@ -283,7 +283,7 @@ class Message extends Model
                     'reads',
                     fn ($query) => $query
                         ->where('user_id', $userId)
-                        ->where('reat_at', '!=', null)
+                        ->where('read_at', '!=', null)
                 );
         });
     }
