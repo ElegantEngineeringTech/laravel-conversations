@@ -16,7 +16,7 @@ return new class extends Migration
             $table->nullableMorphs('conversationable');
 
             $table->foreignId('latest_message_id')->nullable();
-            $table->datetime('messaged_at')->nullable();
+            $table->datetime('messaged_at')->nullable()->index();
 
             $table->json('metadata')->nullable();
 
