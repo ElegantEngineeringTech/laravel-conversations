@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -16,11 +18,13 @@ return new class extends Migration
             $table->nullableMorphs('conversationable');
 
             $table->foreignId('latest_message_id')->nullable();
-            $table->datetime('messaged_at')->nullable()->index();
+            $table->datetime('messaged_at')->nullable();
 
             $table->json('metadata')->nullable();
 
             $table->timestamps();
+
+            $table->index(['latest_message_id', 'messaged_at']);
         });
     }
 
