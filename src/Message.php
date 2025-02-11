@@ -262,7 +262,11 @@ class Message extends Model
 
         $query
             ->where('read_at', null)
-            ->where('user_id', '!=', $userId)
+            ->where(function ($query) use ($userId) {
+                $query
+                    ->where('user_id', null)
+                    ->orWhere('user_id', '!=', $userId);
+            })
             ->whereDoesntHave(
                 'reads',
                 fn ($query) => $query
