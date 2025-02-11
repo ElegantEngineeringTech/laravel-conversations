@@ -67,11 +67,21 @@ class ConversationUser extends Pivot
         return $this->belongsTo(static::getModelConversation());
     }
 
+    public function isMessageRead(Message|int $message): bool
+    {
+        $messageId = $message instanceof Message ? $message->id : $message;
+
+        return $this->last_read_message_id === null || $this->last_read_message_id >= $messageId;
+    }
+
     public function markAsDenormalizedRead(Message|int $message): static
     {
         $messageId = $message instanceof Message ? $message->id : $message;
 
-        if ($messageId > $this->last_read_message_id) {
+        if (
+            $this->last_read_message_id === null ||
+            $this->last_read_message_id < $messageId
+        ) {
             $this->last_read_message_id = $messageId;
         }
 
