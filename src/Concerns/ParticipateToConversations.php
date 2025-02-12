@@ -10,6 +10,7 @@ use Elegantly\Conversation\Message;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Support\Facades\DB;
 
 /**
  * @template TConversationUser of ConversationUser
@@ -21,7 +22,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * @property ?TMessage $latestMessage
  * @property ?TConversationUser $conversationUser Conversation Pivot
  */
-trait HasConversationsTrait
+trait ParticipateToConversations
 {
     protected static function bootHasConversationsTrait(): void
     {
@@ -71,6 +72,8 @@ trait HasConversationsTrait
     }
 
     /**
+     * Return unread conversations using the `message_reads` table
+     *
      * @return BelongsToMany<TConversation, $this>
      */
     public function conversationsUnread(): BelongsToMany
@@ -79,11 +82,37 @@ trait HasConversationsTrait
     }
 
     /**
+     * Return read conversations using the `message_reads` table
+     *
      * @return BelongsToMany<TConversation, $this>
      */
     public function conversationsRead(): BelongsToMany
     {
         return $this->conversations()->read($this->id);
+    }
+
+    /**
+     * Return unread conversations using the pivot column `conversation_user.last_read_message_id`
+     *
+     * @return BelongsToMany<TConversation, $this>
+     */
+    public function denormalizedConversationsUnread(): BelongsToMany
+    {
+        return $this
+            ->conversations()
+            ->wherePivot('last_read_message_id', '<', DB::raw('conversations.latest_message_id'));
+    }
+
+    /**
+     * Return read conversations using the pivot column `conversation_user.last_read_message_id`
+     *
+     * @return BelongsToMany<TConversation, $this>
+     */
+    public function denormalizedConversationsRead(): BelongsToMany
+    {
+        return $this
+            ->conversations()
+            ->wherePivot('last_read_message_id', '>=', DB::raw('conversations.latest_message_id'));
     }
 
     /**

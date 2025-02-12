@@ -39,8 +39,8 @@ use League\CommonMark\MarkdownConverter;
  * @property ?TUser $user
  * @property Collection<int, MessageRead> $reads
  * @property ?ArrayObject<array-key, mixed> $metadata
- * @property ?Carbon $created_at
- * @property ?Carbon $read_at
+ * @property Carbon $created_at
+ * @property Carbon $read_at
  * @property ?Carbon $deleted_at
  */
 class Message extends Model
@@ -179,21 +179,28 @@ class Message extends Model
         return $this;
     }
 
-    public function isReadBy(User|int $user): bool
+    public function getReadAt(User|int $user): ?Carbon
     {
         $userId = $user instanceof User ? $user->getKey() : $user;
 
         if ($this->user_id === $userId) {
-            return true;
+            return $this->created_at;
         }
 
         if ($this->read_at) {
-            return true;
+            return $this->read_at;
         }
 
-        return (bool) $this->reads->firstWhere(function ($read) use ($userId) {
+        $read = $this->reads->firstWhere(function ($read) use ($userId) {
             return $read->user_id === $userId && $read->read_at !== null;
         });
+
+        return $read?->read_at;
+    }
+
+    public function isReadBy(User|int $user): bool
+    {
+        return (bool) $this->getReadAt($user);
     }
 
     public function isReadByAnyone(): bool
