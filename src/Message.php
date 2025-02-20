@@ -39,8 +39,8 @@ use League\CommonMark\MarkdownConverter;
  * @property ?TUser $user
  * @property Collection<int, MessageRead> $reads
  * @property ?ArrayObject<array-key, mixed> $metadata
+ * @property ?Carbon $read_at
  * @property Carbon $created_at
- * @property Carbon $read_at
  * @property ?Carbon $deleted_at
  */
 class Message extends Model

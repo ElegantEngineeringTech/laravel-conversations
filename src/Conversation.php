@@ -194,6 +194,7 @@ class Conversation extends Model
     {
         $userId = $user instanceof User ? $user->getKey() : $user;
 
+        // @phpstan-ignore-next-line
         $query->whereHas('denormalizedLatestMessage', fn ($query) => $query->unread($userId));
     }
 
@@ -201,6 +202,7 @@ class Conversation extends Model
     {
         $userId = $user instanceof User ? $user->getKey() : $user;
 
+        // @phpstan-ignore-next-line
         $query->whereHas('denormalizedLatestMessage', fn ($query) => $query->read($userId));
     }
 }
