@@ -7,6 +7,7 @@ namespace Elegantly\Conversation\Concerns;
 use Elegantly\Conversation\Conversation;
 use Elegantly\Conversation\ConversationUser;
 use Elegantly\Conversation\Message;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
