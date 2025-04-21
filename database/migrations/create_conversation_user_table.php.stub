@@ -27,7 +27,7 @@ return new class extends Migration
 
             $table->timestamps();
 
-            $table->index(['archived_at', 'muted_at', 'user_id']);
+            $table->index(['user_id','archived_at', 'muted_at']);
 
             $table->unique(['conversation_id', 'user_id']);
         });
