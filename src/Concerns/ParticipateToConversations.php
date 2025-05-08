@@ -101,7 +101,12 @@ trait ParticipateToConversations
     {
         return $this
             ->conversations()
-            ->wherePivot('last_read_message_id', '<', DB::raw('conversations.latest_message_id'));
+            ->where(function ($query) {
+                return $query
+                    ->wherePivot('last_read_message_id', '=', null)
+                    ->orWherePivot('last_read_message_id', '<', DB::raw('conversations.latest_message_id'));
+            });
+
     }
 
     /**
