@@ -71,7 +71,7 @@ class ConversationUser extends Pivot
     {
         $messageId = $message instanceof Message ? $message->id : $message;
 
-        return $this->last_read_message_id === null || $this->last_read_message_id >= $messageId;
+        return $this->last_read_message_id && $this->last_read_message_id >= $messageId;
     }
 
     public function markAsDenormalizedRead(Message|int $message): static

@@ -61,7 +61,7 @@ trait ParticipateToConversations
     }
 
     /**
-     * @return BelongsToMany<TConversation, $this>
+     * @return BelongsToMany<TConversation, $this, TConversationUser, 'conversationUser'>
      */
     public function conversations(): BelongsToMany
     {
@@ -75,7 +75,7 @@ trait ParticipateToConversations
     /**
      * Return unread conversations using the `message_reads` table
      *
-     * @return BelongsToMany<TConversation, $this>
+     * @return BelongsToMany<TConversation, $this, TConversationUser, 'conversationUser'>
      */
     public function conversationsUnread(): BelongsToMany
     {
@@ -85,7 +85,7 @@ trait ParticipateToConversations
     /**
      * Return read conversations using the `message_reads` table
      *
-     * @return BelongsToMany<TConversation, $this>
+     * @return BelongsToMany<TConversation, $this, TConversationUser, 'conversationUser'>
      */
     public function conversationsRead(): BelongsToMany
     {
@@ -95,7 +95,7 @@ trait ParticipateToConversations
     /**
      * Return unread conversations using the pivot column `conversation_user.last_read_message_id`
      *
-     * @return BelongsToMany<TConversation, $this>
+     * @return BelongsToMany<TConversation, $this, TConversationUser, 'conversationUser'>
      */
     public function denormalizedConversationsUnread(): BelongsToMany
     {
@@ -103,8 +103,8 @@ trait ParticipateToConversations
             ->conversations()
             ->where(function ($query) {
                 return $query
-                    ->wherePivot('last_read_message_id', '=', null)
-                    ->orWherePivot('last_read_message_id', '<', DB::raw('conversations.latest_message_id'));
+                    ->where('conversation_user.last_read_message_id', '=', null)
+                    ->orWhere('conversation_user.last_read_message_id', '<', DB::raw('conversations.latest_message_id'));
             });
 
     }
@@ -112,7 +112,7 @@ trait ParticipateToConversations
     /**
      * Return read conversations using the pivot column `conversation_user.last_read_message_id`
      *
-     * @return BelongsToMany<TConversation, $this>
+     * @return BelongsToMany<TConversation, $this, TConversationUser, 'conversationUser'>
      */
     public function denormalizedConversationsRead(): BelongsToMany
     {
@@ -122,7 +122,7 @@ trait ParticipateToConversations
     }
 
     /**
-     * @return BelongsToMany<TConversation, $this>
+     * @return BelongsToMany<TConversation, $this, TConversationUser, 'conversationUser'>
      */
     public function conversationsNotMuted(): BelongsToMany
     {
@@ -130,7 +130,7 @@ trait ParticipateToConversations
     }
 
     /**
-     * @return BelongsToMany<TConversation, $this>
+     * @return BelongsToMany<TConversation, $this, TConversationUser, 'conversationUser'>
      */
     public function conversationsMuted(): BelongsToMany
     {
@@ -138,7 +138,7 @@ trait ParticipateToConversations
     }
 
     /**
-     * @return BelongsToMany<TConversation, $this>
+     * @return BelongsToMany<TConversation, $this, TConversationUser, 'conversationUser'>
      */
     public function conversationsNotArchived(): BelongsToMany
     {
@@ -146,7 +146,7 @@ trait ParticipateToConversations
     }
 
     /**
-     * @return BelongsToMany<TConversation, $this>
+     * @return BelongsToMany<TConversation, $this, TConversationUser, 'conversationUser'>
      */
     public function conversationsArchived(): BelongsToMany
     {
