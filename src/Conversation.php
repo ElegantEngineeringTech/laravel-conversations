@@ -104,7 +104,7 @@ class Conversation extends Model
     }
 
     /**
-     * @return BelongsToMany<TUser, $this>
+     * @return BelongsToMany<TUser, $this, TConversationUser, 'conversationUser'>
      */
     public function users(): BelongsToMany
     {

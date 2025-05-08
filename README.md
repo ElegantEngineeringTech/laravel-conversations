@@ -1,8 +1,10 @@
 # Attach a conversation to any model and easily create a chat
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/elegantly/laravel-conversations.svg?style=flat-square)](https://packagist.org/packages/elegantly/laravel-conversations)
-[![GitHub Tests Action Status](https://img.shields.io/github/actions/workflow/status/elegantly/laravel-conversations/run-tests.yml?branch=main&label=tests&style=flat-square)](https://github.com/ElegantEngineeringTech/laravel-conversations/actions?query=workflow%3Arun-tests+branch%3Amain)
-[![GitHub Code Style Action Status](https://img.shields.io/github/actions/workflow/status/elegantly/laravel-conversations/fix-php-code-style-issues.yml?branch=main&label=code%20style&style=flat-square)](https://github.com/ElegantEngineeringTech/laravel-conversations/actions?query=workflow%3A"Fix+PHP+code+style+issues"+branch%3Amain)
+[![Tests](https://img.shields.io/github/actions/workflow/status/ElegantEngineeringTech/laravel-conversations/run-tests.yml?branch=main&label=tests&style=flat-square)](https://github.com/ElegantEngineeringTech/laravel-conversations/actions?query=workflow%3Arun-tests+branch%3Amain)
+[![Code Style](https://img.shields.io/github/actions/workflow/status/ElegantEngineeringTech/laravel-conversations/fix-php-code-style-issues.yml?branch=main&label=code%20style&style=flat-square)](https://github.com/ElegantEngineeringTech/laravel-conversations/actions?query=workflow%3A"Fix+PHP+code+style+issues"+branch%3Amain)
+[![PHPStan Level](https://img.shields.io/github/actions/workflow/status/ElegantEngineeringTech/laravel-conversations/phpstan.yml?label=phpstan&style=flat-square)](https://github.com/ElegantEngineeringTech/laravel-conversations/actions?query=workflow%3Aphpstan)
+[![Laravel Pint](https://img.shields.io/github/actions/workflow/status/ElegantEngineeringTech/laravel-conversations/pint.yml?label=laravel%20pint&style=flat-square)](https://github.com/ElegantEngineeringTech/laravel-conversations/actions?query=workflow%3Apint)
 [![Total Downloads](https://img.shields.io/packagist/dt/elegantly/laravel-conversations.svg?style=flat-square)](https://packagist.org/packages/elegantly/laravel-conversations)
 
 This package the basic architecture of a chat between multiple users.
