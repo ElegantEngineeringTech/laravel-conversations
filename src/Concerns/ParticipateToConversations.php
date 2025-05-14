@@ -101,6 +101,7 @@ trait ParticipateToConversations
     {
         return $this
             ->conversations()
+            ->where('conversations.latest_message_id', '!=', null)
             ->where(function ($query) {
                 return $query
                     ->where('conversation_user.last_read_message_id', '=', null)
@@ -118,7 +119,11 @@ trait ParticipateToConversations
     {
         return $this
             ->conversations()
-            ->wherePivot('last_read_message_id', '>=', DB::raw('conversations.latest_message_id'));
+            ->where(function ($query) {
+                $query
+                    ->where('conversations.latest_message_id', '=', null)
+                    ->orWhere('conversation_user.last_read_message_id', '>=', DB::raw('conversations.latest_message_id'));
+            });
     }
 
     /**
