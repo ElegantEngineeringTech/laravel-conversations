@@ -4,20 +4,17 @@ declare(strict_types=1);
 
 namespace Elegantly\Conversation\Concerns;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 
 /**
- * @property ?string $uuid
+ * @property string $uuid
  */
 trait HasUuid
 {
-    public static function bootHasUuid(): void
+    public function initializeHasUuid(): void
     {
-        static::creating(function (Model $model) {
-            if (empty($model->uuid)) {
-                $model->uuid = (string) Str::uuid(); // @phpstan-ignore-line
-            }
-        });
+        if (blank($this->uuid)) {
+            $this->uuid = (string) Str::uuid();
+        }
     }
 }
