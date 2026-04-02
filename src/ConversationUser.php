@@ -18,7 +18,7 @@ use Illuminate\Foundation\Auth\User;
  * @property int $id
  * @property int $conversation_id
  * @property int $user_id
- * @property int $last_read_message_id
+ * @property ?int $last_read_message_id
  * @property ?ArrayObject $metadata
  * @property ?Carbon $muted_at
  * @property ?Carbon $archived_at
