@@ -1,10 +1,10 @@
 # Attach a chat to any model with granular read tracking
 
-[![Latest Version on Packagist](https://img.shields.io/packagist/v/elegantly/laravel-conversation.svg)](https://packagist.org/packages/elegantly/laravel-conversation)
-[![Total Downloads](https://img.shields.io/packagist/dt/elegantly/laravel-conversation.svg)](https://packagist.org/packages/elegantly/laravel-conversation)
-[![Tests](https://github.com/ElegantEngineeringTech/laravel-conversation/actions/workflows/run-tests.yml/badge.svg)](https://github.com/ElegantEngineeringTech/laravel-conversation/actions/workflows/run-tests.yml)
-[![Laravel Pint](https://github.com/ElegantEngineeringTech/laravel-conversation/actions/workflows/pint.yml/badge.svg)](https://github.com/ElegantEngineeringTech/laravel-conversation/actions/workflows/pint.yml)
-[![PHPStan](https://github.com/ElegantEngineeringTech/laravel-conversation/actions/workflows/phpstan.yml/badge.svg)](https://github.com/ElegantEngineeringTech/laravel-conversation/actions/workflows/phpstan.yml)
+[![Latest Version on Packagist](https://img.shields.io/packagist/v/elegantly/laravel-conversations.svg)](https://packagist.org/packages/elegantly/laravel-conversations)
+[![Total Downloads](https://img.shields.io/packagist/dt/elegantly/laravel-conversations.svg)](https://packagist.org/packages/elegantly/laravel-conversations)
+[![Tests](https://github.com/ElegantEngineeringTech/laravel-conversations/actions/workflows/run-tests.yml/badge.svg)](https://github.com/ElegantEngineeringTech/laravel-conversations/actions/workflows/run-tests.yml)
+[![Laravel Pint](https://github.com/ElegantEngineeringTech/laravel-conversations/actions/workflows/pint.yml/badge.svg)](https://github.com/ElegantEngineeringTech/laravel-conversations/actions/workflows/pint.yml)
+[![PHPStan](https://github.com/ElegantEngineeringTech/laravel-conversations/actions/workflows/phpstan.yml/badge.svg)](https://github.com/ElegantEngineeringTech/laravel-conversations/actions/workflows/phpstan.yml)
 
 This package gives your Laravel app a lightweight, backend-only chat system. It supports multiple users per conversation, per-message read tracking, pivot-level read pointers, and optional model attachment via polymorphic relations.
 
