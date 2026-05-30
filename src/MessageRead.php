@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Elegantly\Conversation;
 
-use Carbon\Carbon;
+use Carbon\CarbonInterface;
 use Elegantly\Conversation\Concerns\HasUuid;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -16,19 +16,19 @@ use Illuminate\Foundation\Auth\User;
  *
  * @property int $id
  * @property ?string $origin
- * @property ?Carbon $read_at
+ * @property ?CarbonInterface $read_at
  * @property int $message_id
  * @property TMessage $message
  * @property int $user_id
  * @property TUser $user
- * @property Carbon $updated_at
- * @property Carbon $created_at
+ * @property CarbonInterface $updated_at
+ * @property CarbonInterface $created_at
  */
 class MessageRead extends Model
 {
     use HasUuid;
 
-    protected $guarded = [];
+    protected $guarded = ['id', 'uuid'];
 
     protected $casts = [
         'read_at' => 'datetime',
@@ -43,19 +43,19 @@ class MessageRead extends Model
     }
 
     /**
-     * @return BelongsTo<TUser, $this>
-     */
-    public function user(): BelongsTo
-    {
-        return $this->belongsTo(static::getModelUser());
-    }
-
-    /**
      * @return class-string<TMessage>
      */
     public static function getModelMessage(): string
     {
         return config()->string('conversations.model_message');
+    }
+
+    /**
+     * @return BelongsTo<TUser, $this>
+     */
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(static::getModelUser());
     }
 
     /**

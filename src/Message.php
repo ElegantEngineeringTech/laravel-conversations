@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Elegantly\Conversation;
 
-use Carbon\Carbon;
+use Carbon\CarbonInterface;
 use Elegantly\Conversation\Concerns\HasUuid;
 use Elegantly\Conversation\Database\Factories\MessageFactory;
 use Illuminate\Database\Eloquent\Builder;
@@ -24,9 +24,9 @@ use League\CommonMark\Extension\InlinesOnly\InlinesOnlyExtension;
 use League\CommonMark\MarkdownConverter;
 
 /**
- * @template TMessageRead of MessageRead
- * @template TConversation of Conversation
  * @template TUser of User
+ * @template TConversation of Conversation
+ * @template TMessageRead of MessageRead
  *
  * @property int $id
  * @property string $uuid
@@ -37,11 +37,10 @@ use League\CommonMark\MarkdownConverter;
  * @property TConversation $conversation
  * @property ?int $user_id
  * @property ?TUser $user
- * @property Collection<int, MessageRead> $reads
+ * @property Collection<int, TMessageRead> $reads
  * @property ?ArrayObject<array-key, mixed> $metadata
- * @property ?Carbon $read_at
- * @property Carbon $created_at
- * @property ?Carbon $deleted_at
+ * @property CarbonInterface $created_at
+ * @property ?CarbonInterface $deleted_at
  */
 class Message extends Model
 {
@@ -50,11 +49,10 @@ class Message extends Model
 
     use HasUuid;
 
-    protected $guarded = [];
+    protected $guarded = ['id', 'uuid'];
 
     protected $casts = [
         'metadata' => AsArrayObject::class,
-        'read_at' => 'datetime',
         'deleted_at' => 'datetime',
         'widget' => 'array',
     ];
@@ -63,13 +61,10 @@ class Message extends Model
     {
         static::deleting(function (self $message) {
 
-            if (method_exists($message, 'isForceDeleting')) {
-                if ($message->isForceDeleting()) {
-                    $message->reads()->delete();
-                }
-            } else {
+            if (! method_exists($message, 'isForceDeleting') || $message->isForceDeleting()) {
                 $message->reads()->delete();
             }
+
         });
     }
 
@@ -121,30 +116,51 @@ class Message extends Model
         return $this->hasMany(static::getModelRead());
     }
 
-    public function markAsRead(): static
-    {
-        $this->read_at = now();
-
-        return $this;
-    }
-
-    public function markAsUnread(): static
-    {
-        $this->read_at = null;
-
-        return $this;
-    }
-
-    public function markAsReadBy(User|int $user, ?Carbon $date = null): static
+    public function scopeByUser(Builder $query, User|int|null $user): Builder
     {
         $userId = $user instanceof User ? $user->getKey() : $user;
+
+        if ($userId === null) {
+            return $query->whereNull('user_id');
+        }
+
+        return $query->where('user_id', $userId);
+    }
+
+    public function scopeNotByUser(Builder $query, User|int|null $user): Builder
+    {
+        $userId = $user instanceof User ? $user->getKey() : $user;
+
+        if ($userId === null) {
+            return $query->whereNotNull('user_id');
+        }
+
+        return $query->where(function ($query) use ($userId) {
+            return $query
+                ->whereNull('user_id')
+                ->orWhere('user_id', '!=', $userId);
+        });
+    }
+
+    public function markAsReadBy(
+        User|int $user,
+        ?CarbonInterface $date = null,
+        bool $force = false,
+    ): static {
+        $userId = $user instanceof User ? $user->getKey() : $user;
+        $date ??= now();
 
         $read = static::getModelRead()::query()->firstOrNew([
             'user_id' => $userId,
             'message_id' => $this->id,
         ]);
 
-        $read->read_at = $date ?? now();
+        if ($force) {
+            $read->read_at = $date;
+        } else {
+            $read->read_at ??= $date;
+        }
+
         $read->save();
 
         if ($this->relationLoaded('reads')) {
@@ -161,10 +177,14 @@ class Message extends Model
     {
         $userId = $user instanceof User ? $user->getKey() : $user;
 
-        $read = static::getModelRead()::query()->firstOrNew([
-            'user_id' => $userId,
-            'message_id' => $this->id,
-        ]);
+        $read = static::getModelRead()::query()
+            ->where('user_id', $userId)
+            ->where('message_id', $this->id)
+            ->first();
+
+        if ($read === null) {
+            return $this;
+        }
 
         $read->read_at = null;
         $read->save();
@@ -179,33 +199,77 @@ class Message extends Model
         return $this;
     }
 
-    public function getReadAt(User|int $user): ?Carbon
+    /**
+     * @return TMessageRead
+     */
+    public function getReadBy(User|int $user): ?MessageRead
     {
         $userId = $user instanceof User ? $user->getKey() : $user;
 
-        if ($this->user_id === $userId) {
-            return $this->created_at;
-        }
+        return $this->reads->firstWhere('user_id', $userId);
+    }
 
-        if ($this->read_at) {
-            return $this->read_at;
-        }
-
-        $read = $this->reads->firstWhere(function ($read) use ($userId) {
-            return $read->user_id === $userId && $read->read_at !== null;
-        });
-
-        return $read?->read_at;
+    public function getReadByAt(User|int $user): ?CarbonInterface
+    {
+        return $this->getReadBy($user)?->read_at;
     }
 
     public function isReadBy(User|int $user): bool
     {
-        return (bool) $this->getReadAt($user);
+        return (bool) $this->getReadByAt($user);
     }
 
-    public function isReadByAnyone(): bool
+    public function isNotReadBy(User|int $user): bool
     {
-        return $this->read_at || $this->reads->where('read_at', '!=', null)->isNotEmpty();
+        return ! $this->isReadBy($user);
+    }
+
+    /**
+     * @param  null|int[]  $except
+     */
+    public function isReadByAnyone(?array $except = null): bool
+    {
+        return $this->reads
+            ->except($except)
+            ->some('read_at', '!=', null);
+    }
+
+    /**
+     * @param  int[]  $users
+     */
+    public function isReadByAll(array $users = []): bool
+    {
+        foreach ($users as $user) {
+            if ($this->isNotReadBy($user)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    public function scopeUnreadBy(Builder $query, User|int $user): Builder
+    {
+        $userId = $user instanceof User ? $user->getKey() : $user;
+
+        return $query->whereDoesntHave(
+            'reads',
+            fn ($query) => $query
+                ->where('user_id', $userId)
+                ->whereNotNull('read_at')
+        );
+    }
+
+    public function scopeReadBy(Builder $query, User|int $user): Builder
+    {
+        $userId = $user instanceof User ? $user->getKey() : $user;
+
+        return $query->whereHas(
+            'reads',
+            fn ($query) => $query
+                ->where('user_id', $userId)
+                ->whereNotNull('read_at')
+        );
     }
 
     public function hasWidget(): bool
@@ -261,41 +325,5 @@ class Message extends Model
     public function toMarkdown(): ?HtmlString
     {
         return static::markdown($this->content);
-    }
-
-    public function scopeUnread(Builder $query, User|int $user): void
-    {
-        $userId = $user instanceof User ? $user->getKey() : $user;
-
-        $query
-            ->where('read_at', null)
-            ->where(function ($query) use ($userId) {
-                $query
-                    ->where('user_id', null)
-                    ->orWhere('user_id', '!=', $userId);
-            })
-            ->whereDoesntHave(
-                'reads',
-                fn ($query) => $query
-                    ->where('user_id', $userId)
-                    ->where('read_at', '!=', null)
-            );
-    }
-
-    public function scopeRead(Builder $query, User|int $user): void
-    {
-        $userId = $user instanceof User ? $user->getKey() : $user;
-
-        $query->where(function (Builder $query) use ($userId) {
-            $query
-                ->where('read_at', '!=', null)
-                ->orWhere('user_id', $userId)
-                ->orWhereHas(
-                    'reads',
-                    fn ($query) => $query
-                        ->where('user_id', $userId)
-                        ->where('read_at', '!=', null)
-                );
-        });
     }
 }

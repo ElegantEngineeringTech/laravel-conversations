@@ -1,13 +1,13 @@
 # Attach a conversation to any model and easily create a chat
 
-[![Latest Version on Packagist](https://img.shields.io/packagist/v/elegantly/laravel-conversations.svg?style=flat-square)](https://packagist.org/packages/elegantly/laravel-conversations)
-[![Tests](https://img.shields.io/github/actions/workflow/status/ElegantEngineeringTech/laravel-conversations/run-tests.yml?branch=main&label=tests&style=flat-square)](https://github.com/ElegantEngineeringTech/laravel-conversations/actions?query=workflow%3Arun-tests+branch%3Amain)
-[![Code Style](https://img.shields.io/github/actions/workflow/status/ElegantEngineeringTech/laravel-conversations/fix-php-code-style-issues.yml?branch=main&label=code%20style&style=flat-square)](https://github.com/ElegantEngineeringTech/laravel-conversations/actions?query=workflow%3A"Fix+PHP+code+style+issues"+branch%3Amain)
-[![PHPStan Level](https://img.shields.io/github/actions/workflow/status/ElegantEngineeringTech/laravel-conversations/phpstan.yml?label=phpstan&style=flat-square)](https://github.com/ElegantEngineeringTech/laravel-conversations/actions?query=workflow%3Aphpstan)
-[![Laravel Pint](https://img.shields.io/github/actions/workflow/status/ElegantEngineeringTech/laravel-conversations/pint.yml?label=laravel%20pint&style=flat-square)](https://github.com/ElegantEngineeringTech/laravel-conversations/actions?query=workflow%3Apint)
-[![Total Downloads](https://img.shields.io/packagist/dt/elegantly/laravel-conversations.svg?style=flat-square)](https://packagist.org/packages/elegantly/laravel-conversations)
+[![Latest Version on Packagist](https://img.shields.io/packagist/v/elegantly/laravel-conversation.svg)](https://packagist.org/packages/elegantly/laravel-conversation)
+[![Total Downloads](https://img.shields.io/packagist/dt/elegantly/laravel-conversation.svg)](https://packagist.org/packages/elegantly/laravel-conversation)
+[![Tests](https://github.com/ElegantEngineeringTech/laravel-conversation/actions/workflows/run-tests.yml/badge.svg)](https://github.com/ElegantEngineeringTech/laravel-conversation/actions/workflows/run-tests.yml)
+[![Laravel Pint](https://github.com/ElegantEngineeringTech/laravel-conversation/actions/workflows/pint.yml/badge.svg)](https://github.com/ElegantEngineeringTech/laravel-conversation/actions/workflows/pint.yml)
+[![PHPStan](https://github.com/ElegantEngineeringTech/laravel-conversation/actions/workflows/phpstan.yml/badge.svg)](https://github.com/ElegantEngineeringTech/laravel-conversation/actions/workflows/phpstan.yml)
 
-This package the basic architecture of a chat between multiple users.
+
+This package provides the backend for building chat supporting multiple users and granular reads.
 
 ## Installation
 
@@ -86,7 +86,13 @@ $message = new Message([
 
 $message->user()->associate($this->user);
 
-$this->conversation->messages()->save($message);
+$this->conversation->send($message);
+
+```
+
+### 3. Query unread conversations
+
+```php
 
 ```
 

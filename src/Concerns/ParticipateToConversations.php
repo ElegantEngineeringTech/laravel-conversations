@@ -11,7 +11,6 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
-use Illuminate\Support\Facades\DB;
 
 /**
  * @template TConversationUser of ConversationUser
@@ -65,31 +64,13 @@ trait ParticipateToConversations
      */
     public function conversations(): BelongsToMany
     {
-        return $this->belongsToMany(static::getModelConversation())
-            ->as('conversationUser')
+        return $this
+            ->belongsToMany(static::getModelConversation())
             ->using(static::getModelConversationUser())
+            ->as('conversationUser')
             ->withPivot(['id', 'last_read_message_id', 'muted_at', 'archived_at', 'conversation_id', 'user_id', 'metadata'])
             ->withTimestamps();
-    }
 
-    /**
-     * Return unread conversations using the `message_reads` table
-     *
-     * @return BelongsToMany<TConversation, $this, TConversationUser, 'conversationUser'>
-     */
-    public function conversationsUnread(): BelongsToMany
-    {
-        return $this->conversations()->unread($this->id);
-    }
-
-    /**
-     * Return read conversations using the `message_reads` table
-     *
-     * @return BelongsToMany<TConversation, $this, TConversationUser, 'conversationUser'>
-     */
-    public function conversationsRead(): BelongsToMany
-    {
-        return $this->conversations()->read($this->id);
     }
 
     /**
@@ -97,15 +78,15 @@ trait ParticipateToConversations
      *
      * @return BelongsToMany<TConversation, $this, TConversationUser, 'conversationUser'>
      */
-    public function denormalizedConversationsUnread(): BelongsToMany
+    public function denormalizedUnreadConversations(): BelongsToMany
     {
         return $this
             ->conversations()
-            ->where('conversations.latest_message_id', '!=', null)
+            ->whereNotNull('conversations.latest_message_id')
             ->where(function ($query) {
-                return $query
-                    ->where('conversation_user.last_read_message_id', '=', null)
-                    ->orWhere('conversation_user.last_read_message_id', '<', DB::raw('conversations.latest_message_id'));
+                $query
+                    ->whereNull('conversation_user.last_read_message_id')
+                    ->orWhereColumn('conversation_user.last_read_message_id', '<', 'conversations.latest_message_id');
             });
 
     }
@@ -115,14 +96,14 @@ trait ParticipateToConversations
      *
      * @return BelongsToMany<TConversation, $this, TConversationUser, 'conversationUser'>
      */
-    public function denormalizedConversationsRead(): BelongsToMany
+    public function denormalizedReadConversations(): BelongsToMany
     {
         return $this
             ->conversations()
             ->where(function ($query) {
                 $query
-                    ->where('conversations.latest_message_id', '=', null)
-                    ->orWhere('conversation_user.last_read_message_id', '>=', DB::raw('conversations.latest_message_id'));
+                    ->whereNull('conversations.latest_message_id')
+                    ->orWhereColumn('conversation_user.last_read_message_id', '>=', 'conversations.latest_message_id');
             });
     }
 
@@ -131,7 +112,7 @@ trait ParticipateToConversations
      */
     public function conversationsNotMuted(): BelongsToMany
     {
-        return $this->conversations()->wherePivot('muted_at', null);
+        return $this->conversations()->wherePivotNull('muted_at');
     }
 
     /**
@@ -139,7 +120,7 @@ trait ParticipateToConversations
      */
     public function conversationsMuted(): BelongsToMany
     {
-        return $this->conversations()->wherePivot('muted_at', '!=', null);
+        return $this->conversations()->wherePivotNotNull('muted_at');
     }
 
     /**
@@ -147,7 +128,7 @@ trait ParticipateToConversations
      */
     public function conversationsNotArchived(): BelongsToMany
     {
-        return $this->conversations()->wherePivot('archived_at', null);
+        return $this->conversations()->wherePivotNull('archived_at');
     }
 
     /**
@@ -155,7 +136,7 @@ trait ParticipateToConversations
      */
     public function conversationsArchived(): BelongsToMany
     {
-        return $this->conversations()->wherePivot('archived_at', '!=', null);
+        return $this->conversations()->wherePivotNotNull('archived_at');
     }
 
     /**

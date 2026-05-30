@@ -6,20 +6,6 @@ use Elegantly\Conversation\Conversation;
 use Elegantly\Conversation\Message;
 use Elegantly\Conversation\Tests\Models\User;
 
-it('can have multiple participants', function () {
-
-    $conversation = new Conversation;
-    $conversation->save();
-
-    $user1 = User::create();
-    $user2 = User::create();
-
-    $conversation->users()->attach($user1->id);
-    $conversation->users()->attach($user2->id);
-
-    expect($conversation->users)->toHaveLength(2);
-});
-
 it('can send a message', function () {
 
     $conversation = new Conversation;
@@ -37,6 +23,10 @@ it('can send a message', function () {
 
     expect($conversation->latest_message_id)->toBe($message->id);
     expect($conversation->messaged_at == $message->created_at)->toBe(true);
+
+    expect($conversation->getConversationUser($user)->hasRead($message))->toBe(true);
+
+    expect($message->isReadBy($user))->toBe(true);
 });
 
 it('can read a message', function () {
@@ -47,7 +37,7 @@ it('can read a message', function () {
     $user = User::create();
     $user2 = User::create();
 
-    $conversation->users()->sync([$user->id, $user2]);
+    $conversation->users()->sync([$user, $user2]);
 
     $message = new Message;
     $message->user()->associate($user);
@@ -58,13 +48,11 @@ it('can read a message', function () {
     expect($message->isReadBy($user))->toBe(true);
 
     expect($message->isReadBy($user2))->toBe(false);
-    expect($message->reads)->toHaveLength(0);
 
     $message->markAsReadBy($user2);
 
     expect($message->isReadBy($user2))->toBe(true);
 
-    expect($message->reads)->toHaveLength(1);
 });
 
 it('query unread conversations', function () {
@@ -72,43 +60,59 @@ it('query unread conversations', function () {
     $conversation = new Conversation;
     $conversation->save();
 
+    /** @var User */
     $user = User::create();
+    /** @var User */
     $user2 = User::create();
 
-    $conversation->users()->attach($user->id);
-    $conversation->users()->attach($user2->id);
+    $conversation->users()->sync([$user, $user2]);
 
-    $message = new Message;
-    $message->user()->associate($user);
-    $message->content = 'foo';
-
-    $conversation->send($message);
+    $message = $conversation->send(new Message([
+        'user_id' => $user->id,
+        'content' => 'foo',
+    ]));
 
     expect(
-        $user2->conversations()->unread($user2)->count()
-    )
-        ->toBe(
-            $user2->conversationsUnread()->count()
-        )
-        ->toBe(1);
+        Conversation::query()->unreadBy($user)->count()
+    )->toBe(0);
 
     expect(
-        $user->conversations()->unread($user)->count()
-    )
-        ->toBe(
-            $user->conversationsUnread()->count()
-        )
-        ->toBe(0);
+        Conversation::query()->unreadBy($user2)->count()
+    )->toBe(1);
 
     $message->markAsReadBy($user2);
 
     expect(
-        $user2->conversations()->unread($user2)->count()
-    )
-        ->toBe(
-            $user2->conversationsUnread()->count()
-        )
-        ->toBe(0);
+        Conversation::query()->unreadBy($user)->count()
+    )->toBe(0);
+
+    expect(
+        Conversation::query()->unreadBy($user2)->count()
+    )->toBe(0);
+
+    $message2 = $conversation->send(new Message([
+        'user_id' => $user2->id,
+        'content' => 'bar',
+    ]));
+
+    expect(
+        Conversation::query()->unreadBy($user)->count()
+    )->toBe(1);
+
+    expect(
+        Conversation::query()->unreadBy($user2)->count()
+    )->toBe(0);
+
+    $message2->markAsReadBy($user);
+
+    expect(
+        Conversation::query()->unreadBy($user)->count()
+    )->toBe(0);
+
+    expect(
+        Conversation::query()->unreadBy($user2)->count()
+    )->toBe(0);
+
 });
 
 it('query read conversations', function () {
@@ -116,41 +120,56 @@ it('query read conversations', function () {
     $conversation = new Conversation;
     $conversation->save();
 
+    /** @var User */
     $user = User::create();
+    /** @var User */
     $user2 = User::create();
 
-    $conversation->users()->attach($user->id);
-    $conversation->users()->attach($user2->id);
+    $conversation->users()->sync([$user, $user2]);
 
-    $message = new Message;
-    $message->user()->associate($user);
-    $message->content = 'foo';
-
-    $conversation->send($message);
+    $message = $conversation->send(new Message([
+        'user_id' => $user->id,
+        'content' => 'foo',
+    ]));
 
     expect(
-        $user2->conversations()->read($user2)->count()
-    )
-        ->toBe(
-            $user2->conversationsRead()->count()
-        )
-        ->toBe(0);
+        Conversation::query()->readBy($user)->count()
+    )->toBe(1);
 
     expect(
-        $user->conversations()->read($user)->count()
-    )
-        ->toBe(
-            $user->conversationsRead()->count()
-        )
-        ->toBe(1);
+        Conversation::query()->readBy($user2)->count()
+    )->toBe(0);
 
     $message->markAsReadBy($user2);
 
     expect(
-        $user2->conversations()->read($user2)->count()
-    )
-        ->toBe(
-            $user2->conversationsRead()->count()
-        )
-        ->toBe(1);
+        Conversation::query()->readBy($user)->count()
+    )->toBe(1);
+
+    expect(
+        Conversation::query()->readBy($user2)->count()
+    )->toBe(1);
+
+    $message2 = $conversation->send(new Message([
+        'user_id' => $user2->id,
+        'content' => 'bar',
+    ]));
+
+    expect(
+        Conversation::query()->readBy($user)->count()
+    )->toBe(0);
+
+    expect(
+        Conversation::query()->readBy($user2)->count()
+    )->toBe(1);
+
+    $message2->markAsReadBy($user);
+
+    expect(
+        Conversation::query()->readBy($user)->count()
+    )->toBe(1);
+
+    expect(
+        Conversation::query()->readBy($user2)->count()
+    )->toBe(1);
 });

@@ -6,7 +6,7 @@ use Elegantly\Conversation\Conversation;
 use Elegantly\Conversation\Message;
 use Elegantly\Conversation\Tests\Models\User;
 
-it('query unread messages', function () {
+it('query user unread conversations', function () {
 
     $conversation = new Conversation;
     $conversation->save();
@@ -24,25 +24,27 @@ it('query unread messages', function () {
     ]));
 
     expect(
-        $conversation->messages()->unreadBy($user2)->count()
+        $user->denormalizedUnreadConversations()->count()
+    )->toBe(0);
+
+    expect(
+        $user2->denormalizedUnreadConversations()->count()
     )->toBe(1);
 
+    $conversation
+        ->getConversationUser($user2)
+        ?->markAsRead($message);
+
     expect(
-        $conversation->messages()->unreadBy($user)->count()
+        $user->denormalizedUnreadConversations()->count()
     )->toBe(0);
 
-    $message->markAsReadBy($user2);
-
     expect(
-        $conversation->messages()->unreadBy($user2)->count()
-    )->toBe(0);
-
-    expect(
-        $conversation->messages()->unreadBy($user)->count()
+        $user2->denormalizedUnreadConversations()->count()
     )->toBe(0);
 });
 
-it('query read messages', function () {
+it('query user read conversations', function () {
 
     $conversation = new Conversation;
     $conversation->save();
@@ -60,20 +62,22 @@ it('query read messages', function () {
     ]));
 
     expect(
-        $conversation->messages()->readBy($user2)->count()
+        $user->denormalizedReadConversations()->count()
+    )->toBe(1);
+
+    expect(
+        $user2->denormalizedReadConversations()->count()
     )->toBe(0);
 
+    $conversation
+        ->getConversationUser($user2)
+        ?->markAsRead($message);
+
     expect(
-        $conversation->messages()->readBy($user)->count()
+        $user->denormalizedReadConversations()->count()
     )->toBe(1);
 
-    $message->markAsReadBy($user2);
-
     expect(
-        $conversation->messages()->readBy($user2)->count()
-    )->toBe(1);
-
-    expect(
-        $conversation->messages()->readBy($user)->count()
+        $user2->denormalizedReadConversations()->count()
     )->toBe(1);
 });

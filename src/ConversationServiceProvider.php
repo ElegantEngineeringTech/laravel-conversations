@@ -24,6 +24,7 @@ class ConversationServiceProvider extends PackageServiceProvider
                 'create_messages_table',
                 'create_conversation_user_table',
                 'create_message_reads_table',
+                'drop_read_at_column_in_messages_table',
             ]);
     }
 }

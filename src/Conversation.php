@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Elegantly\Conversation;
 
-use Carbon\Carbon;
+use Carbon\CarbonInterface;
 use Elegantly\Conversation\Concerns\HasUuid;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\AsArrayObject;
@@ -35,18 +35,18 @@ use Illuminate\Foundation\Auth\User;
  * @property ?TMessage $latestMessage
  * @property ?TMessage $oldestMessage
  * @property ?TConversationUser $conversationUser User Pivot
- * @property ?Carbon $messaged_at
+ * @property ?CarbonInterface $messaged_at
  * @property ?int $latest_message_id
  * @property ?TMessage $denormalizedLatestMessage
- * @property Carbon $updated_at
- * @property Carbon $created_at
+ * @property CarbonInterface $updated_at
+ * @property CarbonInterface $created_at
  */
 class Conversation extends Model
 {
     use HasFactory;
     use HasUuid;
 
-    protected $guarded = [];
+    protected $guarded = ['id', 'uuid'];
 
     protected $casts = [
         'metadata' => AsArrayObject::class,
@@ -63,11 +63,16 @@ class Conversation extends Model
          * - Flexibility: You can choose how to deal with it
          */
         static::deleting(function (self $conversation) {
-            $conversation->users()->detach();
+            if (! method_exists($conversation, 'isForceDeleting') || $conversation->isForceDeleting()) {
 
-            if (config('conversations.cascade_conversation_delete_to_messages')) {
-                $conversation->messages()->delete();
+                $conversation->users()->detach();
+
+                if (config('conversations.cascade_conversation_delete_to_messages')) {
+                    $conversation->messages()->delete();
+                }
+
             }
+
         });
     }
 
@@ -109,8 +114,8 @@ class Conversation extends Model
     public function users(): BelongsToMany
     {
         return $this->belongsToMany(static::getModelUser())
-            ->as('conversationUser')
             ->using(static::getModelConversationUser())
+            ->as('conversationUser')
             ->withPivot(['id', 'last_read_message_id', 'muted_at', 'archived_at', 'conversation_id', 'user_id', 'metadata'])
             ->withTimestamps();
     }
@@ -156,9 +161,25 @@ class Conversation extends Model
     }
 
     /**
-     * @param  TMessage  $message
+     * @return TConversationUser
      */
-    public function send(Message $message): static
+    public function getConversationUser(User|int $user): ?ConversationUser
+    {
+        $userId = $user instanceof User ? $user->getKey() : $user;
+
+        // @phpstan-ignore-next-line
+        return $this->users->find($userId)?->conversationUser;
+    }
+
+    /**
+     * Save the new message
+     * Denormalize the conversation
+     * Mark the message as read by the sender
+     *
+     * @param  TMessage  $message
+     * @return TMessage
+     */
+    public function send(Message $message): Message
     {
         $this->messages()->save($message);
 
@@ -166,43 +187,39 @@ class Conversation extends Model
         $this->messaged_at = $message->created_at->clone();
         $this->save();
 
-        return $this;
+        if ($message->user_id) {
+            $this->getConversationUser($message->user_id)?->markAsRead($message);
+            $message->markAsReadBy($message->user_id, $message->created_at->clone());
+        }
+
+        return $message;
     }
 
     /**
-     * Update `last_read_message_id` pivot value
+     * Return unread conversations without any denormalization
      */
-    public function markAsDenormalizedReadBy(User|int $user): static
+    public function scopeUnreadBy(Builder $query, User|int $user): Builder
     {
-        /** @var int $userId */
         $userId = $user instanceof User ? $user->getKey() : $user;
 
-        /** @var ?ConversationUser $pivot */
-        // @phpstan-ignore-next-line
-        $pivot = $this->users->find($userId)?->conversationUser;
-
-        if ($pivot) {
-            $pivot
-                ->markAsDenormalizedRead($this->latest_message_id)
-                ->save();
-        }
-
-        return $this;
+        return $query->whereHas(
+            'latestMessage',
+            // @phpstan-ignore-next-line
+            fn ($query) => $query->unreadBy($userId)
+        );
     }
 
-    public function scopeUnread(Builder $query, User|int $user): void
+    /**
+     * Return read conversations without any denormalization
+     */
+    public function scopeReadBy(Builder $query, User|int $user): Builder
     {
         $userId = $user instanceof User ? $user->getKey() : $user;
 
-        // @phpstan-ignore-next-line
-        $query->whereHas('denormalizedLatestMessage', fn ($query) => $query->unread($userId));
-    }
-
-    public function scopeRead(Builder $query, User|int $user): void
-    {
-        $userId = $user instanceof User ? $user->getKey() : $user;
-
-        // @phpstan-ignore-next-line
-        $query->whereHas('denormalizedLatestMessage', fn ($query) => $query->read($userId));
+        return $query->whereHas(
+            'latestMessage',
+            // @phpstan-ignore-next-line
+            fn ($query) => $query->readBy($userId)
+        );
     }
 }
