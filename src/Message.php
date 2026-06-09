@@ -307,8 +307,8 @@ class Message extends Model
 
     public static function markdown(?string $value): ?HtmlString
     {
-        if (! $value) {
-            return null;
+        if ($value === null || blank($value)) {
+            return $value;
         }
 
         $environment = new Environment(config('conversations.markdown.environment'));

@@ -274,6 +274,15 @@ return [
     'markdown' => [
         'environment' => [
             'allow_unsafe_links' => false,
+            'html_input' => 'strip',
+            'external_link' => [
+                'internal_hosts' => env('APP_URL', '') ?: null,
+                'open_in_new_window' => true,
+                'html_class' => '',
+                'nofollow' => 'external',
+                'noopener' => 'external',
+                'noreferrer' => 'external',
+            ],
         ],
     ],
 ];
