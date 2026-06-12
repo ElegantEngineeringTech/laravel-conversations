@@ -15,7 +15,7 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('messages', function (Blueprint $table) {
+        Schema::table('messages', function (Blueprint $table) {
             $table->dropColumn('read_at');
         });
     }
@@ -27,7 +27,7 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::create('messages', function (Blueprint $table) {
+        Schema::table('messages', function (Blueprint $table) {
             $table->dateTime('read_at')->nullable();
         });
     }
