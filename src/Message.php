@@ -6,12 +6,8 @@ namespace Elegantly\Conversation;
 
 use Carbon\CarbonInterface;
 use Elegantly\Conversation\Concerns\HasUuid;
-use Elegantly\Conversation\Database\Factories\MessageFactory;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Casts\ArrayObject;
-use Illuminate\Database\Eloquent\Casts\AsArrayObject;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -38,24 +34,24 @@ use League\CommonMark\MarkdownConverter;
  * @property ?int $user_id
  * @property ?TUser $user
  * @property Collection<int, TMessageRead> $reads
- * @property ?ArrayObject<array-key, mixed> $metadata
+ * @property ?array<array-key, mixed> $metadata
  * @property CarbonInterface $created_at
  * @property ?CarbonInterface $deleted_at
  */
 class Message extends Model
 {
-    /** @use HasFactory<MessageFactory> */
-    use HasFactory;
-
     use HasUuid;
 
     protected $guarded = ['id', 'uuid'];
 
-    protected $casts = [
-        'metadata' => AsArrayObject::class,
-        'deleted_at' => 'datetime',
-        'widget' => 'array',
-    ];
+    public function casts()
+    {
+        return [
+            'metadata' => 'array',
+            'deleted_at' => 'datetime',
+            'widget' => 'array',
+        ];
+    }
 
     protected static function booted(): void
     {
@@ -116,6 +112,10 @@ class Message extends Model
         return $this->hasMany(static::getModelRead());
     }
 
+    /**
+     * @param  Builder<static>  $query
+     * @return Builder<static>
+     */
     public function scopeByUser(Builder $query, User|int|null $user): Builder
     {
         $userId = $user instanceof User ? $user->getKey() : $user;
@@ -127,6 +127,10 @@ class Message extends Model
         return $query->where('user_id', $userId);
     }
 
+    /**
+     * @param  Builder<static>  $query
+     * @return Builder<static>
+     */
     public function scopeNotByUser(Builder $query, User|int|null $user): Builder
     {
         $userId = $user instanceof User ? $user->getKey() : $user;
@@ -248,6 +252,10 @@ class Message extends Model
         return true;
     }
 
+    /**
+     * @param  Builder<static>  $query
+     * @return Builder<static>
+     */
     public function scopeUnreadBy(Builder $query, User|int $user): Builder
     {
         $userId = $user instanceof User ? $user->getKey() : $user;
@@ -260,6 +268,10 @@ class Message extends Model
         );
     }
 
+    /**
+     * @param  Builder<static>  $query
+     * @return Builder<static>
+     */
     public function scopeReadBy(Builder $query, User|int $user): Builder
     {
         $userId = $user instanceof User ? $user->getKey() : $user;

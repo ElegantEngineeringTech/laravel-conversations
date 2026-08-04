@@ -20,7 +20,7 @@ return new class extends Migration
             $table->foreignId('conversation_id');
             $table->foreignId('user_id');
 
-            $table->json('metadata')->nullable();
+            $table->jsonb('metadata')->nullable();
 
             $table->datetime('muted_at')->nullable();
             $table->datetime('archived_at')->nullable();

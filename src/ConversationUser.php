@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace Elegantly\Conversation;
 
 use Carbon\CarbonInterface;
-use Illuminate\Database\Eloquent\Casts\ArrayObject;
-use Illuminate\Database\Eloquent\Casts\AsArrayObject;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Foundation\Auth\User;
@@ -20,7 +18,7 @@ use Illuminate\Foundation\Auth\User;
  * @property int $conversation_id
  * @property int $user_id
  * @property ?int $last_read_message_id
- * @property ?ArrayObject $metadata
+ * @property ?array<array-key, mixed> $metadata
  * @property ?CarbonInterface $muted_at
  * @property ?CarbonInterface $archived_at
  * @property CarbonInterface $updated_at
@@ -32,11 +30,14 @@ class ConversationUser extends Pivot
 
     protected $guarded = ['id'];
 
-    protected $casts = [
-        'muted_at' => 'datetime',
-        'archived_at' => 'datetime',
-        'metadata' => AsArrayObject::class,
-    ];
+    public function casts()
+    {
+        return [
+            'muted_at' => 'datetime',
+            'archived_at' => 'datetime',
+            'metadata' => 'array',
+        ];
+    }
 
     /**
      * @return class-string<TUser>
@@ -80,6 +81,9 @@ class ConversationUser extends Pivot
         return $this->last_read_message_id && $this->last_read_message_id >= $messageId;
     }
 
+    /**
+     * @param  TMessage|int  $message
+     */
     public function markAsRead(
         Message|int $message,
         bool $force = false,

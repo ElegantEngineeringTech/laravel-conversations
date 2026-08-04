@@ -7,9 +7,7 @@ namespace Elegantly\Conversation;
 use Carbon\CarbonInterface;
 use Elegantly\Conversation\Concerns\HasUuid;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Casts\AsArrayObject;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -37,21 +35,24 @@ use Illuminate\Foundation\Auth\User;
  * @property ?TConversationUser $conversationUser User Pivot
  * @property ?CarbonInterface $messaged_at
  * @property ?int $latest_message_id
+ * @property ?array<array-key, mixed> $metadata
  * @property ?TMessage $denormalizedLatestMessage
  * @property CarbonInterface $updated_at
  * @property CarbonInterface $created_at
  */
 class Conversation extends Model
 {
-    use HasFactory;
     use HasUuid;
 
     protected $guarded = ['id', 'uuid'];
 
-    protected $casts = [
-        'metadata' => AsArrayObject::class,
-        'messaged_at' => 'datetime',
-    ];
+    public function casts()
+    {
+        return [
+            'metadata' => 'array',
+            'messaged_at' => 'datetime',
+        ];
+    }
 
     protected static function booted(): void
     {
@@ -197,6 +198,9 @@ class Conversation extends Model
 
     /**
      * Return unread conversations without any denormalization
+     *
+     * @param  Builder<static>  $query
+     * @return Builder<static>
      */
     public function scopeUnreadBy(Builder $query, User|int $user): Builder
     {
@@ -211,6 +215,9 @@ class Conversation extends Model
 
     /**
      * Return read conversations without any denormalization
+     *
+     * @param  Builder<static>  $query
+     * @return Builder<static>
      */
     public function scopeReadBy(Builder $query, User|int $user): Builder
     {
