@@ -180,8 +180,15 @@ class Conversation extends Model
      * @param  TMessage  $message
      * @return TMessage
      */
-    public function send(Message $message): Message
-    {
+    public function send(
+        Message $message,
+        ?User $user = null
+    ): Message {
+
+        if ($user) {
+            $message->user()->associate($user);
+        }
+
         $this->messages()->save($message);
 
         $this->latest_message_id = $message->id;
