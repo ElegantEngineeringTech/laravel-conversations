@@ -178,12 +178,11 @@ class Conversation extends Model
      * Mark the message as read by the sender
      *
      * @param  TMessage  $message
-     * @return TMessage
      */
     public function send(
         Message $message,
         ?User $user = null
-    ): Message {
+    ): static {
 
         if ($user) {
             $message->user()->associate($user);
@@ -204,7 +203,7 @@ class Conversation extends Model
             );
         }
 
-        return $message;
+        return $this;
     }
 
     /**
