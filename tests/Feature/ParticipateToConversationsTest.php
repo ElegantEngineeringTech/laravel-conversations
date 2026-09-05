@@ -18,10 +18,12 @@ it('query user unread conversations', function () {
 
     $conversation->users()->sync([$user, $user2]);
 
-    $message = $conversation->send(new Message([
+    $message = new Message([
         'user_id' => $user->id,
         'content' => 'foo',
-    ]));
+    ]);
+
+    $conversation->send($message);
 
     expect(
         $user->denormalizedUnreadConversations()->count()
@@ -56,10 +58,12 @@ it('query user read conversations', function () {
 
     $conversation->users()->sync([$user, $user2]);
 
-    $message = $conversation->send(new Message([
+    $message = new Message([
         'user_id' => $user->id,
         'content' => 'foo',
-    ]));
+    ]);
+
+    $conversation->send($message);
 
     expect(
         $user->denormalizedReadConversations()->count()

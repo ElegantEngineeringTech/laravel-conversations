@@ -67,7 +67,7 @@ it('query unread conversations', function () {
 
     $conversation->users()->sync([$user, $user2]);
 
-    $message = $conversation->send(new Message([
+    $conversation->send($message = new Message([
         'user_id' => $user->id,
         'content' => 'foo',
     ]));
@@ -90,7 +90,7 @@ it('query unread conversations', function () {
         Conversation::query()->unreadBy($user2)->count()
     )->toBe(0);
 
-    $message2 = $conversation->send(new Message([
+    $conversation->send($message2 = new Message([
         'user_id' => $user2->id,
         'content' => 'bar',
     ]));
@@ -127,7 +127,7 @@ it('query read conversations', function () {
 
     $conversation->users()->sync([$user, $user2]);
 
-    $message = $conversation->send(new Message([
+    $conversation->send($message = new Message([
         'user_id' => $user->id,
         'content' => 'foo',
     ]));
@@ -150,7 +150,7 @@ it('query read conversations', function () {
         Conversation::query()->readBy($user2)->count()
     )->toBe(1);
 
-    $message2 = $conversation->send(new Message([
+    $conversation->send($message2 = new Message([
         'user_id' => $user2->id,
         'content' => 'bar',
     ]));

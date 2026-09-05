@@ -18,7 +18,7 @@ it('query unread messages', function () {
 
     $conversation->users()->sync([$user, $user2]);
 
-    $message = $conversation->send(new Message([
+    $conversation->send($message = new Message([
         'user_id' => $user->id,
         'content' => 'foo',
     ]));
@@ -54,10 +54,12 @@ it('query read messages', function () {
 
     $conversation->users()->sync([$user, $user2]);
 
-    $message = $conversation->send(new Message([
+    $message = new Message([
         'user_id' => $user->id,
         'content' => 'foo',
-    ]));
+    ]);
+
+    $conversation->send($message);
 
     expect(
         $conversation->messages()->readBy($user2)->count()

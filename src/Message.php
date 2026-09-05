@@ -45,7 +45,10 @@ class Message extends Model
 
     protected $guarded = ['id', 'uuid'];
 
-    public function casts()
+    /**
+     * @return array<string, string>
+     */
+    protected function casts(): array
     {
         return [
             'metadata' => 'array',

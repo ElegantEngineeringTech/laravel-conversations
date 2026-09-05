@@ -32,10 +32,16 @@ class MessageRead extends Model
 
     protected $guarded = ['id', 'uuid'];
 
-    protected $casts = [
-        'read_at' => 'datetime',
-        'notified_at' => 'datetime',
-    ];
+    /**
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'read_at' => 'datetime',
+            'notified_at' => 'datetime',
+        ];
+    }
 
     /**
      * @return class-string<TUser>

@@ -30,7 +30,10 @@ class ConversationUser extends Pivot
 
     protected $guarded = ['id'];
 
-    public function casts()
+    /**
+     * @return array<string, string>
+     */
+    protected function casts(): array
     {
         return [
             'muted_at' => 'datetime',
