@@ -17,12 +17,14 @@ use Illuminate\Foundation\Auth\User;
  * @property int $id
  * @property ?string $origin
  * @property ?CarbonInterface $read_at
+ * @property ?CarbonInterface $notified_at
+ * @property ?string $notified_channel
  * @property int $message_id
- * @property TMessage $message
  * @property int $user_id
- * @property TUser $user
  * @property CarbonInterface $updated_at
  * @property CarbonInterface $created_at
+ * @property-read TUser $user
+ * @property-read TMessage $message
  */
 class MessageRead extends Model
 {
@@ -32,6 +34,7 @@ class MessageRead extends Model
 
     protected $casts = [
         'read_at' => 'datetime',
+        'notified_at' => 'datetime',
     ];
 
     /**

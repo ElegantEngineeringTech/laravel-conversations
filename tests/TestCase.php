@@ -47,6 +47,8 @@ class TestCase extends Orchestra
                 'create_messages_table',
                 'create_conversation_user_table',
                 'create_message_reads_table',
+                'drop_read_at_column_in_messages_table',
+                'add_notified_at_column_to_message_reads_table',
             ] as $migration
         ) {
             (include package_path("database/migrations/{$migration}.php.stub"))->up();

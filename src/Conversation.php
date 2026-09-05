@@ -190,7 +190,11 @@ class Conversation extends Model
 
         if ($message->user_id) {
             $this->getConversationUser($message->user_id)?->markAsRead($message);
-            $message->markAsReadBy($message->user_id, $message->created_at->clone());
+            $message->markAsReadAndNotifiedTo(
+                user: $message->user_id,
+                channel: null,
+                date: $message->created_at
+            );
         }
 
         return $message;

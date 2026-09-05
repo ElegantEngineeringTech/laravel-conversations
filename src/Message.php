@@ -30,13 +30,14 @@ use League\CommonMark\MarkdownConverter;
  * @property ?string $content
  * @property ?array{ component: string, props: array<array-key, mixed> } $widget
  * @property int $conversation_id
- * @property TConversation $conversation
+ * @property-read TConversation $conversation
  * @property ?int $user_id
- * @property ?TUser $user
- * @property Collection<int, TMessageRead> $reads
+ * @property-read ?TUser $user
+ * @property-read Collection<int, TMessageRead> $reads
  * @property ?array<array-key, mixed> $metadata
- * @property CarbonInterface $created_at
  * @property ?CarbonInterface $deleted_at
+ * @property CarbonInterface $updated_at
+ * @property CarbonInterface $created_at
  */
 class Message extends Model
 {
@@ -149,20 +150,18 @@ class Message extends Model
     public function markAsReadBy(
         User|int $user,
         ?CarbonInterface $date = null,
-        bool $force = false,
     ): static {
         $userId = $user instanceof User ? $user->getKey() : $user;
-        $date ??= now();
 
         $read = static::getModelRead()::query()->firstOrNew([
             'user_id' => $userId,
             'message_id' => $this->id,
         ]);
 
-        if ($force) {
-            $read->read_at = $date;
+        if ($date) {
+            $read->read_at = clone $date;
         } else {
-            $read->read_at ??= $date;
+            $read->read_at ??= now();
         }
 
         $read->save();
@@ -170,7 +169,7 @@ class Message extends Model
         if ($this->relationLoaded('reads')) {
             $this->setRelation(
                 'reads',
-                $this->reads->except([$read])->push($read)
+                $this->reads->except([$read->id])->push($read)
             );
         }
 
@@ -196,7 +195,7 @@ class Message extends Model
         if ($this->relationLoaded('reads')) {
             $this->setRelation(
                 'reads',
-                $this->reads->except([$read])->push($read)
+                $this->reads->except([$read->id])->push($read)
             );
         }
 
@@ -281,6 +280,141 @@ class Message extends Model
             fn ($query) => $query
                 ->where('user_id', $userId)
                 ->whereNotNull('read_at')
+        );
+    }
+
+    public function markAsReadAndNotifiedTo(
+        User|int $user,
+        ?string $channel = null,
+        ?CarbonInterface $date = null,
+    ): static {
+        $userId = $user instanceof User ? $user->getKey() : $user;
+
+        $read = static::getModelRead()::query()->firstOrNew([
+            'user_id' => $userId,
+            'message_id' => $this->id,
+        ]);
+
+        if ($date) {
+            $read->read_at = clone $date;
+            $read->notified_at = clone $date;
+            $read->notified_channel = $channel;
+        } else {
+            $read->read_at ??= now();
+            $read->notified_at ??= now();
+            $read->notified_channel ??= $channel;
+        }
+
+        $read->save();
+
+        if ($this->relationLoaded('reads')) {
+            $this->setRelation(
+                'reads',
+                $this->reads->except([$read->id])->push($read)
+            );
+        }
+
+        return $this;
+    }
+
+    public function markAsNotifiedTo(
+        User|int $user,
+        ?string $channel = null,
+        ?CarbonInterface $date = null,
+    ): static {
+        $userId = $user instanceof User ? $user->getKey() : $user;
+
+        $read = static::getModelRead()::query()->firstOrNew([
+            'user_id' => $userId,
+            'message_id' => $this->id,
+        ]);
+
+        if ($date) {
+            $read->notified_at = clone $date;
+            $read->notified_channel = $channel;
+        } else {
+            $read->notified_at ??= now();
+            $read->notified_channel ??= $channel;
+        }
+
+        $read->save();
+
+        if ($this->relationLoaded('reads')) {
+            $this->setRelation(
+                'reads',
+                $this->reads->except([$read->id])->push($read)
+            );
+        }
+
+        return $this;
+    }
+
+    public function markAsUnNotifiedTo(User|int $user): static
+    {
+        $userId = $user instanceof User ? $user->getKey() : $user;
+
+        $read = static::getModelRead()::query()
+            ->where('user_id', $userId)
+            ->where('message_id', $this->id)
+            ->first();
+
+        if ($read === null) {
+            return $this;
+        }
+
+        $read->notified_at = null;
+        $read->notified_channel = null;
+        $read->save();
+
+        if ($this->relationLoaded('reads')) {
+            $this->setRelation(
+                'reads',
+                $this->reads->except([$read->id])->push($read)
+            );
+        }
+
+        return $this;
+    }
+
+    public function getNotifiedToAt(User|int $user): ?CarbonInterface
+    {
+        return $this->getReadBy($user)?->notified_at;
+    }
+
+    public function isNotifiedTo(User|int $user): bool
+    {
+        return (bool) $this->getNotifiedToAt($user);
+    }
+
+    /**
+     * @param  Builder<static>  $query
+     * @return Builder<static>
+     */
+    public function scopeUnNotifiedTo(Builder $query, User|int $user): Builder
+    {
+        $userId = $user instanceof User ? $user->getKey() : $user;
+
+        return $query->whereDoesntHave(
+            'reads',
+            fn ($query) => $query
+                ->where('user_id', $userId)
+                ->whereNotNull('notified_at')
+        );
+    }
+
+    /**
+     * @param  Builder<static>  $query
+     * @return Builder<static>
+     */
+    public function scopeNotifiedTo(Builder $query, User|int $user): Builder
+    {
+        $userId = $user instanceof User ? $user->getKey() : $user;
+
+        return $query->whereHas(
+            'reads',
+            fn ($query) => $query
+                ->where('user_id', $userId)
+                ->whereNotNull('notified_at')
         );
     }
 
