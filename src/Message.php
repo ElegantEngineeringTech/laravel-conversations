@@ -289,7 +289,7 @@ class Message extends Model
     public function markAsReadAndNotifiedTo(
         User|int $user,
         ?string $channel = null,
-        ?CarbonInterface $date = null,
+        bool|CarbonInterface $force = false,
     ): static {
         $userId = $user instanceof User ? $user->getKey() : $user;
 
@@ -298,14 +298,13 @@ class Message extends Model
             'message_id' => $this->id,
         ]);
 
-        if ($date) {
-            $read->read_at = clone $date;
-            $read->notified_at = clone $date;
+        if ($read->read_at === null || $force) {
+            $read->read_at = $force instanceof CarbonInterface ? $force->clone() : now();
+        }
+
+        if ($read->notified_at === null || $force) {
+            $read->notified_at = $force instanceof CarbonInterface ? $force->clone() : now();
             $read->notified_channel = $channel;
-        } else {
-            $read->read_at ??= now();
-            $read->notified_at ??= now();
-            $read->notified_channel ??= $channel;
         }
 
         $read->save();
@@ -323,7 +322,7 @@ class Message extends Model
     public function markAsNotifiedTo(
         User|int $user,
         ?string $channel = null,
-        ?CarbonInterface $date = null,
+        bool|CarbonInterface $force = false,
     ): static {
         $userId = $user instanceof User ? $user->getKey() : $user;
 
@@ -332,12 +331,9 @@ class Message extends Model
             'message_id' => $this->id,
         ]);
 
-        if ($date) {
-            $read->notified_at = clone $date;
+        if ($read->notified_at === null || $force) {
+            $read->notified_at = $force instanceof CarbonInterface ? $force->clone() : now();
             $read->notified_channel = $channel;
-        } else {
-            $read->notified_at ??= now();
-            $read->notified_channel ??= $channel;
         }
 
         $read->save();

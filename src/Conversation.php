@@ -198,11 +198,13 @@ class Conversation extends Model
         $this->save();
 
         if ($message->user_id) {
-            $this->getConversationUser($message->user_id)?->markAsRead($message);
+            $this
+                ->getConversationUser($message->user_id)
+                ?->markAsRead($message);
+
             $message->markAsReadAndNotifiedTo(
                 user: $message->user_id,
-                channel: null,
-                date: $message->created_at
+                force: $message->created_at,
             );
         }
 
@@ -221,7 +223,6 @@ class Conversation extends Model
 
         return $query->whereHas(
             'latestMessage',
-            // @phpstan-ignore-next-line
             fn ($query) => $query->unreadBy($userId)
         );
     }
@@ -238,7 +239,6 @@ class Conversation extends Model
 
         return $query->whereHas(
             'latestMessage',
-            // @phpstan-ignore-next-line
             fn ($query) => $query->readBy($userId)
         );
     }
