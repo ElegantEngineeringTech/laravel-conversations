@@ -156,7 +156,10 @@ class Message extends Model
     ): static {
         $userId = $user instanceof User ? $user->getKey() : $user;
 
-        $read = static::getModelRead()::query()->firstOrNew([
+        /**
+         * Using firstOrCreate prevent race conditions
+         */
+        $read = static::getModelRead()::query()->firstOrCreate([
             'user_id' => $userId,
             'message_id' => $this->id,
         ]);
@@ -293,7 +296,10 @@ class Message extends Model
     ): static {
         $userId = $user instanceof User ? $user->getKey() : $user;
 
-        $read = static::getModelRead()::query()->firstOrNew([
+        /**
+         * Using firstOrCreate prevent race conditions
+         */
+        $read = static::getModelRead()::query()->firstOrCreate([
             'user_id' => $userId,
             'message_id' => $this->id,
         ]);
@@ -326,7 +332,10 @@ class Message extends Model
     ): static {
         $userId = $user instanceof User ? $user->getKey() : $user;
 
-        $read = static::getModelRead()::query()->firstOrNew([
+        /**
+         * Using firstOrCreate prevent race conditions
+         */
+        $read = static::getModelRead()::query()->firstOrCreate([
             'user_id' => $userId,
             'message_id' => $this->id,
         ]);
